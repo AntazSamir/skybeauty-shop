@@ -78,7 +78,7 @@ const ProductGrid = () => {
               } ${isBentoFull ? "col-span-2 md:col-span-1" : "col-span-1"}`}
               style={{ transitionDelay: `${i * 80}ms` }}
             >
-              <div className="relative aspect-square overflow-hidden bg-muted">
+              <div className={`relative overflow-hidden bg-muted ${isBentoFull ? "aspect-[2/1] md:aspect-square" : "aspect-square"}`}>
                 <img
                   src={product.image}
                   alt={product.name}
