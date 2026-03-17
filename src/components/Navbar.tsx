@@ -3,7 +3,7 @@ import { Search, User, ShoppingBag, Menu, X } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { useNavigate, Link } from "react-router-dom";
 
-const navLinks = ["New", "Bestsellers", "Skincare", "Makeup", "For Him", "Gifts & Sets"];
+const navLinks = ["New", "Bestsellers", "Skincare"];
 
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);

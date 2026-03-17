@@ -8,7 +8,6 @@ const categories = [
   { name: "Skincare", image: productSerum, count: "20+ Products" },
   { name: "Moisturizers", image: productMoisturizer, count: "12+ Products" },
   { name: "Cleansers", image: productCleanser, count: "8+ Products" },
-  { name: "Makeup", image: productLipcare, count: "15+ Products" },
 ];
 
 const CategorySection = () => {
@@ -33,12 +32,12 @@ const CategorySection = () => {
         <p className="font-body text-muted-foreground text-center mb-12 text-sm">
           Find exactly what your skin needs
         </p>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div className="flex flex-wrap justify-center gap-8">
           {categories.map((cat, i) => (
             <a
               key={cat.name}
               href="#"
-              className={`group relative overflow-hidden bg-muted transition-all duration-500 ${
+              className={`group relative overflow-hidden bg-muted transition-all duration-500 w-[calc(50%-16px)] md:w-[280px] ${
                 visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
               }`}
               style={{ transitionDelay: `${i * 100}ms` }}

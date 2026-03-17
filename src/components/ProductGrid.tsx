@@ -109,12 +109,12 @@ const ProductGrid = () => {
         </div>
 
         <div className="text-center mt-12">
-          <a
-            href="#"
+          <Link
+            to="/products"
             className="inline-block border-2 border-foreground text-foreground px-10 py-3 font-body text-sm font-semibold tracking-wide hover:bg-foreground hover:text-background transition-colors duration-200"
           >
             VIEW ALL PRODUCTS
-          </a>
+          </Link>
         </div>
       </div>
     </section>
