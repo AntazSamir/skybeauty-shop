@@ -67,12 +67,15 @@ const ProductGrid = () => {
 
         {/* Grid */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6 auto-rows-auto">
-          {filtered.map((product, i) => (
+          {filtered.map((product, i) => {
+            // Bento pattern on mobile: items 0,3,6 span full width
+            const isBentoFull = i % 3 === 0;
+            return (
             <div
               key={product.id}
               className={`group bg-background border border-border overflow-hidden transition-all duration-500 hover:shadow-lg ${
                 visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-              }`}
+              } ${isBentoFull ? "col-span-2 md:col-span-1" : "col-span-1"}`}
               style={{ transitionDelay: `${i * 80}ms` }}
             >
               <div className="relative aspect-square overflow-hidden bg-muted">
