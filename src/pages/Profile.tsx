@@ -1,18 +1,21 @@
 import { useState } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { User, Package, MapPin, Heart, LogOut, ChevronRight, ShoppingBag } from "lucide-react";
+import { User, Package, MapPin, Heart, LogOut, ChevronRight, ShoppingBag, Camera } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
+import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
 
-const mockUser = {
+const initialUser = {
   name: "Samir Antaz",
   email: "samir@example.com",
   phone: "+880 1712-345678",
   since: "January 2024",
+  birthday: "1995-10-15",
   avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=150&h=150",
 };
 
@@ -54,7 +57,7 @@ const mockAddresses = [
     name: "Samir Antaz",
     address: "House 42, Road 7, Block C",
     area: "Banani, Dhaka 1213",
-    phone: "+880 1712-345678",
+    phone: "+880 1712-341234",
   },
   {
     id: 2,
@@ -68,6 +71,47 @@ const mockAddresses = [
 
 const Profile = () => {
   const [activeTab, setActiveTab] = useState("orders");
+  const [userData, setUserData] = useState(initialUser);
+  const [editForm, setEditForm] = useState(initialUser);
+  const [addresses, setAddresses] = useState(mockAddresses);
+  const [editingAddressId, setEditingAddressId] = useState<number | null>(null);
+  const [addressForm, setAddressForm] = useState(mockAddresses[0]);
+  const { toast } = useToast();
+
+  const handleSave = () => {
+    setUserData(editForm);
+    toast({
+      title: "Profile Updated",
+      description: "Your account details have been saved successfully.",
+    });
+  };
+
+  const handleCancel = () => {
+    setEditForm(userData);
+    toast({
+      title: "Changes Discarded",
+      description: "Your profile remains unchanged.",
+      variant: "destructive",
+    });
+  };
+
+  const saveAddress = () => {
+    setAddresses(addresses.map(a => a.id === editingAddressId ? addressForm : a));
+    setEditingAddressId(null);
+    toast({
+      title: "Address Updated",
+      description: "Your shipping information has been saved.",
+    });
+  };
+
+  const deleteAddress = (id: number) => {
+    setAddresses(addresses.filter(a => a.id !== id));
+    toast({
+      title: "Address Deleted",
+      description: "The address has been removed from your profile.",
+      variant: "destructive",
+    });
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -77,16 +121,21 @@ const Profile = () => {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Sidebar */}
           <div className="lg:col-span-1 space-y-6">
-            <div className="bg-muted/30 p-6 border border-border rounded-lg text-center lg:text-left">
-              <div className="w-24 h-24 rounded-full overflow-hidden mx-auto lg:mx-0 mb-4 border-2 border-primary/20">
-                <img src={mockUser.avatar} alt={mockUser.name} className="w-full h-full object-cover" />
+            <div className="bg-muted/30 p-6 border border-border rounded-lg text-center lg:text-left transition-all hover:shadow-sm">
+              <div className="relative w-24 h-24 mx-auto lg:mx-0 mb-4 group cursor-pointer">
+                <div className="w-full h-full rounded-full overflow-hidden border-2 border-primary/20 transition-transform group-hover:scale-105">
+                  <img src={userData.avatar} alt={userData.name} className="w-full h-full object-cover" />
+                </div>
+                <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Camera className="text-white w-6 h-6" />
+                </div>
               </div>
               <div>
-                <h2 className="font-display text-xl font-bold text-foreground">{mockUser.name}</h2>
-                <p className="font-body text-sm text-muted-foreground">{mockUser.email}</p>
+                <h2 className="font-display text-xl font-bold text-foreground">{userData.name}</h2>
+                <p className="font-body text-sm text-muted-foreground">{userData.email}</p>
                 <div className="mt-4 pt-4 border-t border-border">
                   <p className="font-body text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">Member Since</p>
-                  <p className="font-body text-sm text-foreground">{mockUser.since}</p>
+                  <p className="font-body text-sm text-foreground">{userData.since}</p>
                 </div>
               </div>
             </div>
@@ -191,38 +240,72 @@ const Profile = () => {
               )}
 
               {activeTab === "details" && (
-                <div className="space-y-8">
+                <div className="space-y-8 animate-fade-in">
                   <h1 className="font-display text-2xl font-bold text-foreground">Account Details</h1>
-                  <div className="max-w-xl space-y-6">
+                  <div className="max-w-xl space-y-8">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                       <div className="space-y-2">
-                        <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Full Name</label>
-                        <p className="p-3 bg-muted/30 border border-border rounded-md text-sm font-body">{mockUser.name}</p>
+                        <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest ml-1">Full Name</label>
+                        <Input 
+                          value={editForm.name} 
+                          onChange={(e) => setEditForm({...editForm, name: e.target.value})}
+                          className="font-body text-sm bg-muted/20 border-border focus:ring-primary h-11" 
+                        />
                       </div>
                       <div className="space-y-2">
-                        <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Email Address</label>
-                        <p className="p-3 bg-muted/30 border border-border rounded-md text-sm font-body">{mockUser.email}</p>
+                        <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest ml-1">Email Address</label>
+                        <Input 
+                          value={editForm.email} 
+                          onChange={(e) => setEditForm({...editForm, email: e.target.value})}
+                          className="font-body text-sm bg-muted/20 border-border focus:ring-primary h-11" 
+                        />
                       </div>
                       <div className="space-y-2">
-                        <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Phone Number</label>
-                        <p className="p-3 bg-muted/30 border border-border rounded-md text-sm font-body">{mockUser.phone}</p>
+                        <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest ml-1">Phone Number</label>
+                        <Input 
+                          value={editForm.phone} 
+                          onChange={(e) => setEditForm({...editForm, phone: e.target.value})}
+                          className="font-body text-sm bg-muted/20 border-border focus:ring-primary h-11" 
+                        />
                       </div>
                       <div className="space-y-2">
-                        <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Birthday</label>
-                        <p className="p-3 bg-muted/30 border border-border rounded-md text-sm font-body italic text-muted-foreground">Not specified</p>
+                        <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest ml-1">Birthday</label>
+                        <Input 
+                          type="date"
+                          value={editForm.birthday} 
+                          onChange={(e) => setEditForm({...editForm, birthday: e.target.value})}
+                          className="font-body text-sm bg-muted/20 border-border focus:ring-primary h-11" 
+                        />
                       </div>
                     </div>
-                    <Separator className="my-8" />
+                    
+                    <Separator className="bg-border/60" />
+                    
                     <div className="space-y-4">
-                      <h3 className="font-display text-lg font-semibold text-foreground">Update Password</h3>
-                      <p className="text-xs text-muted-foreground font-body">Change your password to keep your account secure.</p>
-                      <Button variant="outline" className="font-body text-sm">Modify Security Settings</Button>
+                      <div className="flex items-center justify-between">
+                        <h3 className="font-display text-lg font-semibold text-foreground">Update Password</h3>
+                        <Badge variant="outline" className="text-[9px] uppercase font-bold tracking-widest border-primary/20 text-primary">Secure</Badge>
+                      </div>
+                      <p className="text-xs text-muted-foreground font-body leading-relaxed max-w-sm">
+                        It's a good idea to use a strong password that you're not using elsewhere.
+                      </p>
+                      <Button variant="outline" className="font-body text-sm h-11 px-6 hover:bg-muted">
+                        MODIFY SECURITY SETTINGS
+                      </Button>
                     </div>
-                    <div className="flex flex-col sm:flex-row gap-4">
-                      <Button className="w-full sm:w-auto px-10 h-11 font-body font-bold tracking-widest bg-primary text-primary-foreground hover:opacity-90">
+
+                    <div className="flex flex-col sm:flex-row gap-4 pt-4">
+                      <Button 
+                        onClick={handleSave}
+                        className="w-full sm:w-auto px-12 h-12 font-body font-bold tracking-[0.1em] text-xs bg-primary text-primary-foreground hover:shadow-lg hover:shadow-primary/20 transition-all"
+                      >
                         SAVE CHANGES
                       </Button>
-                      <Button variant="outline" className="w-full sm:w-auto px-10 h-11 font-body font-bold tracking-widest">
+                      <Button 
+                        onClick={handleCancel}
+                        variant="ghost" 
+                        className="w-full sm:w-auto px-12 h-12 font-body font-bold tracking-[0.1em] text-xs hover:bg-muted text-muted-foreground"
+                      >
                         CANCEL
                       </Button>
                     </div>
@@ -231,34 +314,117 @@ const Profile = () => {
               )}
 
               {activeTab === "addresses" && (
-                <div className="space-y-8">
+                <div className="space-y-8 animate-fade-in">
                   <div className="flex items-center justify-between">
                     <h1 className="font-display text-2xl font-bold text-foreground">Shipping Addresses</h1>
-                    <Button variant="outline" className="gap-2 font-body text-sm">
+                    <Button 
+                      variant="outline" 
+                      className="gap-2 font-body text-sm h-10 px-6"
+                      onClick={() => {
+                        setEditingAddressId(0);
+                        setAddressForm({
+                          id: Date.now(),
+                          type: "New Address",
+                          name: userData.name,
+                          address: "",
+                          area: "",
+                          phone: userData.phone
+                        });
+                      }}
+                    >
                       <MapPin size={16} /> Add New
                     </Button>
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    {mockAddresses.map((addr) => (
-                      <Card key={addr.id} className="border-border hover:border-primary/40 transition-colors">
-                        <CardHeader className="pb-3 flex-row items-center justify-between space-y-0">
-                          <CardTitle className="text-sm font-display font-bold">{addr.name}</CardTitle>
-                          <Badge variant="secondary" className="text-[9px] uppercase tracking-tighter h-5">{addr.type}</Badge>
-                        </CardHeader>
-                        <CardContent className="space-y-3">
-                          <div className="font-body text-sm text-muted-foreground space-y-1">
-                            <p>{addr.address}</p>
-                            <p>{addr.area}</p>
-                            <p className="pt-2 text-foreground font-medium">Ph: {addr.phone}</p>
+
+                  {editingAddressId !== null ? (
+                    <Card className="border-primary/20 bg-muted/5">
+                      <CardHeader>
+                        <CardTitle className="text-lg font-display">
+                          {editingAddressId === 0 ? "Add Brand New Address" : "Edit Existing Address"}
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-6">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Address Label</label>
+                            <Input value={addressForm.type} onChange={e => setAddressForm({...addressForm, type: e.target.value})} className="h-10" />
                           </div>
-                          <div className="flex gap-4 pt-2">
-                            <button className="text-xs font-body font-semibold text-primary hover:underline">Edit</button>
-                            <button className="text-xs font-body font-semibold text-destructive hover:underline">Delete</button>
+                          <div className="space-y-2">
+                            <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Receiver Name</label>
+                            <Input value={addressForm.name} onChange={e => setAddressForm({...addressForm, name: e.target.value})} className="h-10" />
                           </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
+                          <div className="col-span-full space-y-2">
+                            <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Street Address</label>
+                            <Input value={addressForm.address} onChange={e => setAddressForm({...addressForm, address: e.target.value})} className="h-10" />
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Area / City</label>
+                            <Input value={addressForm.area} onChange={e => setAddressForm({...addressForm, area: e.target.value})} className="h-10" />
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Phone Number</label>
+                            <Input value={addressForm.phone} onChange={e => setAddressForm({...addressForm, phone: e.target.value})} className="h-10" />
+                          </div>
+                        </div>
+                        <div className="flex gap-3 pt-2">
+                          <Button 
+                            className="h-10 px-8 font-bold text-[10px] tracking-widest uppercase"
+                            onClick={() => {
+                              if (editingAddressId === 0) {
+                                setAddresses([...addresses, addressForm]);
+                                setEditingAddressId(null);
+                                toast({ title: "Address Added", description: "Your new shipping location is ready." });
+                              } else {
+                                saveAddress();
+                              }
+                            }}
+                          >
+                            SAVE ADDRESS
+                          </Button>
+                          <Button variant="ghost" className="h-10 px-8 font-bold text-[10px] tracking-widest uppercase" onClick={() => setEditingAddressId(null)}>CANCEL</Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                      {addresses.map((addr) => (
+                        <Card key={addr.id} className="border-border hover:border-primary/40 transition-all hover:shadow-md group">
+                          <CardHeader className="pb-3 flex-row items-center justify-between space-y-0">
+                            <CardTitle className="text-sm font-display font-bold">{addr.name}</CardTitle>
+                            <Badge variant="secondary" className="text-[9px] uppercase tracking-tighter h-5 group-hover:bg-primary group-hover:text-primary-foreground transition-colors">{addr.type}</Badge>
+                          </CardHeader>
+                          <CardContent className="space-y-4">
+                            <div className="font-body text-sm text-muted-foreground space-y-1">
+                              <p className="leading-relaxed">{addr.address}</p>
+                              <p>{addr.area}</p>
+                              <p className="pt-2 text-foreground font-semibold flex items-center gap-2">
+                                <span className="w-1 h-1 rounded-full bg-primary" />
+                                Ph: {addr.phone}
+                              </p>
+                            </div>
+                            <Separator className="bg-border/40" />
+                            <div className="flex gap-6 pt-1">
+                              <button 
+                                onClick={() => {
+                                  setEditingAddressId(addr.id);
+                                  setAddressForm(addr);
+                                }}
+                                className="text-[10px] font-body font-bold text-primary hover:underline tracking-widest uppercase"
+                              >
+                                Edit Details
+                              </button>
+                              <button 
+                                onClick={() => deleteAddress(addr.id)}
+                                className="text-[10px] font-body font-bold text-destructive hover:underline tracking-widest uppercase"
+                              >
+                                Remove
+                              </button>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
 
