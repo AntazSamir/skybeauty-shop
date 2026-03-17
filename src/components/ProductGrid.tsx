@@ -55,7 +55,8 @@ const ProductGrid = () => {
             // Bento pattern on mobile: items 0,3,6 span full width
             const isBentoFull = i % 3 === 0;
             return (
-            <div
+            <Link
+              to={`/product/${getProductSlug(product)}`}
               key={product.id}
               className={`group bg-background border border-border overflow-hidden transition-all duration-500 hover:shadow-lg ${
                 visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
