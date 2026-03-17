@@ -66,16 +66,19 @@ const ProductGrid = () => {
         </div>
 
         {/* Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {filtered.map((product, i) => (
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6 auto-rows-auto">
+          {filtered.map((product, i) => {
+            // Bento pattern on mobile: items 0,3,6 span full width
+            const isBentoFull = i % 3 === 0;
+            return (
             <div
               key={product.id}
               className={`group bg-background border border-border overflow-hidden transition-all duration-500 hover:shadow-lg ${
                 visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-              }`}
+              } ${isBentoFull ? "col-span-2 md:col-span-1" : "col-span-1"}`}
               style={{ transitionDelay: `${i * 80}ms` }}
             >
-              <div className="relative aspect-square overflow-hidden bg-muted">
+              <div className={`relative overflow-hidden bg-muted ${isBentoFull ? "aspect-[2/1] md:aspect-square" : "aspect-square"}`}>
                 <img
                   src={product.image}
                   alt={product.name}
@@ -116,7 +119,8 @@ const ProductGrid = () => {
                 </div>
               </div>
             </div>
-          ))}
+          )})}
+
         </div>
 
         <div className="text-center mt-12">
