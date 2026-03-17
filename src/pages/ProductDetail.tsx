@@ -5,9 +5,39 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { getProductBySlug, products, getProductSlug } from "@/data/products";
 
+import { useCart } from "@/contexts/CartContext";
+
+const reviews = [
+  {
+    id: 1,
+    author: "Sarah J.",
+    rating: 5,
+    date: "March 12, 2024",
+    comment: "Absolutely love this! My skin has never felt better. The texture is lightweight and absorbs quickly.",
+    avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&q=80&w=100&h=100",
+  },
+  {
+    id: 2,
+    author: "Michael R.",
+    rating: 4,
+    date: "February 28, 2024",
+    comment: "Great product, works as advertised. I've noticed a significant difference in just two weeks.",
+    avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=100&h=100",
+  },
+  {
+    id: 3,
+    author: "Emma W.",
+    rating: 5,
+    date: "January 15, 2024",
+    comment: "This is a game changer for my morning routine. Highly recommend to anyone with sensitive skin!",
+    avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=100&h=100",
+  },
+];
+
 const ProductDetail = () => {
   const { slug } = useParams<{ slug: string }>();
   const product = getProductBySlug(slug || "");
+  const { addToCart } = useCart();
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState<"description" | "ingredients" | "how-to-use">("description");
@@ -142,7 +172,10 @@ const ProductDetail = () => {
                   <Plus size={16} />
                 </button>
               </div>
-              <button className="flex-1 h-12 bg-primary text-primary-foreground font-body text-sm font-semibold tracking-wide flex items-center justify-center gap-2 hover:opacity-90 transition-opacity">
+              <button 
+                onClick={() => addToCart(product, quantity)}
+                className="flex-1 h-12 bg-primary text-primary-foreground font-body text-sm font-semibold tracking-wide flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
+              >
                 <ShoppingBag size={18} />
                 ADD TO CART
               </button>
@@ -188,6 +221,79 @@ const ProductDetail = () => {
               {activeTab === "ingredients" && <p>{product.ingredients}</p>}
               {activeTab === "how-to-use" && <p>{product.howToUse}</p>}
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Reviews Section */}
+      <section className="container py-20 border-t border-border">
+        <div className="max-w-4xl mx-auto">
+          <div className="flex flex-col md:flex-row md:items-start justify-between gap-12 mb-16">
+            <div className="space-y-4">
+              <h2 className="font-display text-2xl md:text-3xl font-semibold text-foreground">Customer Reviews</h2>
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-0.5">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <Star
+                      key={i}
+                      size={20}
+                      className={i < Math.floor(product.rating) ? "fill-primary text-primary" : "text-border"}
+                    />
+                  ))}
+                </div>
+                <span className="font-body text-lg font-bold text-foreground">{product.rating} out of 5</span>
+              </div>
+              <p className="font-body text-sm text-muted-foreground text-foreground/70">Based on {product.reviews} reviews</p>
+            </div>
+            
+            <div className="flex-1 max-w-sm space-y-2">
+              {[5, 4, 3, 2, 1].map((rating) => (
+                <div key={rating} className="flex items-center gap-3">
+                  <span className="font-body text-xs text-muted-foreground w-3">{rating}</span>
+                  <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-primary" 
+                      style={{ width: `${rating === 5 ? 80 : rating === 4 ? 15 : 5}%` }} 
+                    />
+                  </div>
+                  <span className="font-body text-xs text-muted-foreground w-8">
+                    {rating === 5 ? "80%" : rating === 4 ? "15%" : "5%"}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            <button className="h-12 px-8 border-2 border-primary text-primary font-body text-sm font-bold tracking-wide hover:bg-primary hover:text-primary-foreground transition-all">
+              WRITE A REVIEW
+            </button>
+          </div>
+
+          <div className="space-y-12">
+            {reviews.map((review) => (
+              <div key={review.id} className="pb-12 border-b border-border last:border-0">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full overflow-hidden bg-muted">
+                      <img src={review.avatar} alt={review.author} className="w-full h-full object-cover" />
+                    </div>
+                    <div>
+                      <h4 className="font-body text-sm font-bold text-foreground">{review.author}</h4>
+                      <p className="font-body text-[11px] text-muted-foreground uppercase tracking-widest">{review.date}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-0.5">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <Star
+                        key={i}
+                        size={12}
+                        className={i < review.rating ? "fill-primary text-primary" : "text-border"}
+                      />
+                    ))}
+                  </div>
+                </div>
+                <p className="font-body text-sm text-muted-foreground leading-relaxed italic">"{review.comment}"</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>

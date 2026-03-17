@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { Search, User, ShoppingBag, Menu, X } from "lucide-react";
+import { useCart } from "@/contexts/CartContext";
 
 const navLinks = ["New", "Bestsellers", "Skincare", "Makeup", "For Him", "Gifts & Sets"];
 
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [cartCount] = useState(0);
+  const { totalItems, setIsCartOpen } = useCart();
 
   return (
     <>
@@ -51,11 +52,15 @@ const Navbar = () => {
             <button className="text-foreground hover:text-primary transition-colors hidden sm:block" aria-label="Account">
               <User size={20} />
             </button>
-            <button className="relative text-foreground hover:text-primary transition-colors" aria-label="Cart">
+            <button 
+              onClick={() => setIsCartOpen(true)}
+              className="relative text-foreground hover:text-primary transition-colors" 
+              aria-label="Cart"
+            >
               <ShoppingBag size={20} />
-              {cartCount > 0 && (
+              {totalItems > 0 && (
                 <span className="absolute -top-1.5 -right-1.5 bg-primary text-primary-foreground text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
-                  {cartCount}
+                  {totalItems}
                 </span>
               )}
             </button>
