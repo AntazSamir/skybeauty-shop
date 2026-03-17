@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { Search, User, ShoppingBag, Menu, X } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
+import { useNavigate, Link } from "react-router-dom";
 
 const navLinks = ["New", "Bestsellers", "Skincare", "Makeup", "For Him", "Gifts & Sets"];
 
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { totalItems, setIsCartOpen } = useCart();
+  const navigate = useNavigate();
 
   return (
     <>
@@ -27,9 +29,9 @@ const Navbar = () => {
           </button>
 
           {/* Logo */}
-          <a href="/" className="font-display text-2xl font-bold tracking-tight text-foreground">
+          <Link to="/" className="font-display text-2xl font-bold tracking-tight text-foreground">
             SkyBD
-          </a>
+          </Link>
 
           {/* Desktop nav */}
           <nav className="hidden lg:flex items-center gap-8">
@@ -49,9 +51,13 @@ const Navbar = () => {
             <button className="text-foreground hover:text-primary transition-colors" aria-label="Search">
               <Search size={20} />
             </button>
-            <button className="text-foreground hover:text-primary transition-colors hidden sm:block" aria-label="Account">
+            <Link 
+              to="/profile" 
+              className="text-foreground hover:text-primary transition-colors hidden sm:block" 
+              aria-label="Account"
+            >
               <User size={20} />
-            </button>
+            </Link>
             <button 
               onClick={() => setIsCartOpen(true)}
               className="relative text-foreground hover:text-primary transition-colors" 

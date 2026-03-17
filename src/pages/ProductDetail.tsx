@@ -4,6 +4,8 @@ import { ShoppingBag, Heart, Star, ChevronLeft, Minus, Plus, Truck, Shield, Rota
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { getProductBySlug, products, getProductSlug } from "@/data/products";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 import { useCart } from "@/contexts/CartContext";
 
@@ -225,75 +227,121 @@ const ProductDetail = () => {
         </div>
       </section>
 
-      {/* Reviews Section */}
-      <section className="container py-20 border-t border-border">
-        <div className="max-w-4xl mx-auto">
-          <div className="flex flex-col md:flex-row md:items-start justify-between gap-12 mb-16">
-            <div className="space-y-4">
-              <h2 className="font-display text-2xl md:text-3xl font-semibold text-foreground">Customer Reviews</h2>
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-0.5">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <Star
-                      key={i}
-                      size={20}
-                      className={i < Math.floor(product.rating) ? "fill-primary text-primary" : "text-border"}
-                    />
-                  ))}
-                </div>
-                <span className="font-body text-lg font-bold text-foreground">{product.rating} out of 5</span>
+      {/* Premium Reviews Section */}
+      <section className="container py-24 border-t border-border bg-muted/20">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4">What Our Community Says</h2>
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <div className="flex items-center gap-0.5">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <Star
+                    key={i}
+                    size={18}
+                    className={i < Math.floor(product.rating) ? "fill-primary text-primary" : "text-border"}
+                  />
+                ))}
               </div>
-              <p className="font-body text-sm text-muted-foreground text-foreground/70">Based on {product.reviews} reviews</p>
+              <span className="font-display text-xl font-bold text-foreground">{product.rating}</span>
             </div>
-            
-            <div className="flex-1 max-w-sm space-y-2">
-              {[5, 4, 3, 2, 1].map((rating) => (
-                <div key={rating} className="flex items-center gap-3">
-                  <span className="font-body text-xs text-muted-foreground w-3">{rating}</span>
-                  <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
-                    <div 
-                      className="h-full bg-primary" 
-                      style={{ width: `${rating === 5 ? 80 : rating === 4 ? 15 : 5}%` }} 
-                    />
-                  </div>
-                  <span className="font-body text-xs text-muted-foreground w-8">
-                    {rating === 5 ? "80%" : rating === 4 ? "15%" : "5%"}
-                  </span>
-                </div>
-              ))}
-            </div>
-
-            <button className="h-12 px-8 border-2 border-primary text-primary font-body text-sm font-bold tracking-wide hover:bg-primary hover:text-primary-foreground transition-all">
-              WRITE A REVIEW
-            </button>
+            <p className="font-body text-sm text-muted-foreground uppercase tracking-widest">Based on {product.reviews} verified reviews</p>
           </div>
 
-          <div className="space-y-12">
-            {reviews.map((review) => (
-              <div key={review.id} className="pb-12 border-b border-border last:border-0">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full overflow-hidden bg-muted">
-                      <img src={review.avatar} alt={review.author} className="w-full h-full object-cover" />
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-20">
+            {/* Rating Summary Card */}
+            <div className="lg:col-span-4">
+              <div className="sticky top-24 bg-background border border-border p-8 rounded-2xl shadow-sm space-y-6">
+                <h3 className="font-display text-lg font-bold text-foreground">Rating Distribution</h3>
+                <div className="space-y-3">
+                  {[5, 4, 3, 2, 1].map((rating) => (
+                    <div key={rating} className="flex items-center gap-4 group">
+                      <span className="font-body text-xs font-semibold text-muted-foreground w-12 flex items-center gap-1">
+                        {rating} <Star size={10} className="fill-muted-foreground" />
+                      </span>
+                      <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-primary transition-all duration-1000 group-hover:opacity-80" 
+                          style={{ width: `${rating === 5 ? 85 : rating === 4 ? 10 : 2}%` }} 
+                        />
+                      </div>
+                      <span className="font-body text-[10px] text-muted-foreground font-bold w-10">
+                        {rating === 5 ? "85%" : rating === 4 ? "10%" : "2%"}
+                      </span>
                     </div>
-                    <div>
-                      <h4 className="font-body text-sm font-bold text-foreground">{review.author}</h4>
-                      <p className="font-body text-[11px] text-muted-foreground uppercase tracking-widest">{review.date}</p>
+                  ))}
+                </div>
+                <div className="pt-6 border-t border-border">
+                  <p className="font-body text-xs text-muted-foreground leading-relaxed mb-6 italic">
+                    95% of customers recommend this product to their friends and family.
+                  </p>
+                  <Button className="w-full h-12 font-bold tracking-widest text-xs uppercase shadow-lg shadow-primary/20 hover:scale-[1.02] transition-transform">
+                    WRITE A REVIEW
+                  </Button>
+                </div>
+              </div>
+            </div>
+
+            {/* Reviews List */}
+            <div className="lg:col-span-8 space-y-6">
+              <div className="flex items-center justify-between mb-8 pb-4 border-b border-border">
+                <p className="font-display text-sm font-bold text-foreground">SORT BY: <span className="text-primary cursor-pointer hover:underline">MOST RECENT</span></p>
+                <div className="flex gap-2">
+                  <Badge variant="outline" className="rounded-full font-body text-[10px] py-1 px-3 cursor-pointer hover:bg-muted transition-colors">With Images</Badge>
+                  <Badge variant="outline" className="rounded-full font-body text-[10px] py-1 px-3 cursor-pointer hover:bg-muted transition-colors">Verified Only</Badge>
+                </div>
+              </div>
+
+              {reviews.map((review) => (
+                <div key={review.id} className="group bg-background border border-border p-8 rounded-2xl hover:border-primary/30 transition-all hover:shadow-xl hover:shadow-primary/5">
+                  <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
+                    <div className="flex flex-col gap-4 flex-1">
+                      <div className="flex items-center gap-0.5">
+                        {Array.from({ length: 5 }).map((_, i) => (
+                          <Star
+                            key={i}
+                            size={14}
+                            className={i < review.rating ? "fill-primary text-primary" : "text-border"}
+                          />
+                        ))}
+                      </div>
+                      <h4 className="font-display text-lg font-bold text-foreground leading-snug">
+                        "{review.id === 1 ? "Simply the best I've used" : review.id === 2 ? "Exceeded my expectations" : "Highly recommended"}"
+                      </h4>
+                      <p className="font-body text-sm text-muted-foreground leading-relaxed italic pr-4">
+                        {review.comment}
+                      </p>
+                      
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        <div className="px-3 py-1 bg-muted/50 rounded-md text-[10px] font-bold text-muted-foreground uppercase">Gentle</div>
+                        <div className="px-3 py-1 bg-muted/50 rounded-md text-[10px] font-bold text-muted-foreground uppercase">Effective</div>
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex items-center gap-0.5">
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <Star
-                        key={i}
-                        size={12}
-                        className={i < review.rating ? "fill-primary text-primary" : "text-border"}
-                      />
-                    ))}
+
+                    <div className="flex items-center md:flex-col md:items-end gap-3 min-w-[140px] shrink-0 border-t md:border-t-0 md:border-l border-border pt-4 md:pt-0 md:pl-6">
+                      <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-primary/20">
+                        <img src={review.avatar} alt={review.author} className="w-full h-full object-cover" />
+                      </div>
+                      <div className="text-left md:text-right">
+                        <div className="flex items-center md:justify-end gap-1 mb-0.5">
+                          <h5 className="font-display text-xs font-bold text-foreground truncate max-w-[100px]">{review.author}</h5>
+                          <div className="w-3 h-3 bg-green-500 rounded-full flex items-center justify-center border-2 border-background">
+                            <div className="w-1 h-1 bg-white rounded-full"></div>
+                          </div>
+                        </div>
+                        <p className="font-body text-[10px] text-muted-foreground uppercase tracking-wider">{review.date}</p>
+                        <p className="font-body text-[9px] text-green-600 font-bold uppercase tracking-widest mt-1">Verified Purchase</p>
+                      </div>
+                    </div>
                   </div>
                 </div>
-                <p className="font-body text-sm text-muted-foreground leading-relaxed italic">"{review.comment}"</p>
+              ))}
+
+              <div className="pt-10 flex justify-center">
+                <Button variant="outline" className="px-12 h-12 font-bold tracking-widest text-xs uppercase hover:bg-primary hover:text-primary-foreground transition-all">
+                  LOAD MORE REVIEWS
+                </Button>
               </div>
-            ))}
+            </div>
           </div>
         </div>
       </section>
