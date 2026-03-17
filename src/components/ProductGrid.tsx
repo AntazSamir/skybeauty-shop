@@ -1,13 +1,7 @@
 import { useState, useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
 import { ShoppingBag, Heart } from "lucide-react";
-import productMoisturizer from "@/assets/product-moisturizer.jpg";
-import productSerum from "@/assets/product-serum.jpg";
-import productCleanser from "@/assets/product-cleanser.jpg";
-import productSunscreen from "@/assets/product-sunscreen.jpg";
-import productLipcare from "@/assets/product-lipcare.jpg";
-import productEyecream from "@/assets/product-eyecream.jpg";
-import productFacemask from "@/assets/product-facemask.jpg";
-import productToner from "@/assets/product-toner.jpg";
+import { products, getProductSlug } from "@/data/products";
 
 const products = [
   { id: 1, name: "Hydra Glow Moisturizer", price: 850, originalPrice: 1200, image: productMoisturizer, tag: "Bestseller", category: "Skincare" },
