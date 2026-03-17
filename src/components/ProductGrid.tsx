@@ -103,7 +103,7 @@ const ProductGrid = () => {
                   )}
                 </div>
               </div>
-            </div>
+            </Link>
           )})}
 
         </div>
