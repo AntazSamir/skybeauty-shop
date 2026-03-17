@@ -1,24 +1,8 @@
 import { useState, useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
 import { ShoppingBag, Heart } from "lucide-react";
-import productMoisturizer from "@/assets/product-moisturizer.jpg";
-import productSerum from "@/assets/product-serum.jpg";
-import productCleanser from "@/assets/product-cleanser.jpg";
-import productSunscreen from "@/assets/product-sunscreen.jpg";
-import productLipcare from "@/assets/product-lipcare.jpg";
-import productEyecream from "@/assets/product-eyecream.jpg";
-import productFacemask from "@/assets/product-facemask.jpg";
-import productToner from "@/assets/product-toner.jpg";
+import { products, getProductSlug } from "@/data/products";
 
-const products = [
-  { id: 1, name: "Hydra Glow Moisturizer", price: 850, originalPrice: 1200, image: productMoisturizer, tag: "Bestseller", category: "Skincare" },
-  { id: 2, name: "Vitamin C Serum", price: 1200, image: productSerum, tag: "New", category: "Skincare" },
-  { id: 3, name: "Gentle Foam Cleanser", price: 550, image: productCleanser, category: "Cleanser" },
-  { id: 4, name: "SPF 50+ Sunscreen", price: 750, originalPrice: 950, image: productSunscreen, category: "Skincare" },
-  { id: 5, name: "Rose Tint Lip Balm", price: 350, image: productLipcare, tag: "Popular", category: "Makeup" },
-  { id: 6, name: "Anti-Aging Eye Cream", price: 980, image: productEyecream, category: "Skincare" },
-  { id: 7, name: "Hydrating Face Mask", price: 450, image: productFacemask, tag: "New", category: "Skincare" },
-  { id: 8, name: "Balancing Toner", price: 680, image: productToner, category: "Skincare" },
-];
 
 const filters = ["All", "Skincare", "Makeup", "Cleanser"];
 
@@ -71,7 +55,8 @@ const ProductGrid = () => {
             // Bento pattern on mobile: items 0,3,6 span full width
             const isBentoFull = i % 3 === 0;
             return (
-            <div
+            <Link
+              to={`/product/${getProductSlug(product)}`}
               key={product.id}
               className={`group bg-background border border-border overflow-hidden transition-all duration-500 hover:shadow-lg ${
                 visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
@@ -118,7 +103,7 @@ const ProductGrid = () => {
                   )}
                 </div>
               </div>
-            </div>
+            </Link>
           )})}
 
         </div>
