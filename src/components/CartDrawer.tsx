@@ -10,6 +10,7 @@ import { ShoppingBag, X, Minus, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
+import { useNavigate } from "react-router-dom";
 
 const CartDrawer = () => {
   const {
@@ -20,6 +21,7 @@ const CartDrawer = () => {
     isCartOpen,
     setIsCartOpen,
   } = useCart();
+  const navigate = useNavigate();
 
   return (
     <Sheet open={isCartOpen} onOpenChange={setIsCartOpen}>
@@ -126,7 +128,13 @@ const CartDrawer = () => {
                 <p className="font-body text-xs text-muted-foreground italic">
                   Taxes and shipping calculated at checkout
                 </p>
-                <Button className="w-full h-12 bg-primary text-primary-foreground font-body text-sm font-bold tracking-widest hover:opacity-90 transition-opacity">
+                <Button 
+                  onClick={() => {
+                    setIsCartOpen(false);
+                    navigate("/checkout");
+                  }}
+                  className="w-full h-12 bg-primary text-primary-foreground font-body text-sm font-bold tracking-widest hover:opacity-90 transition-opacity"
+                >
                   CHECKOUT NOW
                 </Button>
                 <div className="flex justify-center">

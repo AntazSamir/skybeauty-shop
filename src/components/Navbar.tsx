@@ -3,7 +3,7 @@ import { Search, User, ShoppingBag, Menu, X } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { useNavigate, Link } from "react-router-dom";
 
-const navLinks = ["New", "Bestsellers", "Skincare"];
+const navLinks = ["New", "Skincare", "About", "Contact"];
 
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -36,13 +36,17 @@ const Navbar = () => {
           {/* Desktop nav */}
           <nav className="hidden lg:flex items-center gap-8">
             {navLinks.map((link) => (
-              <a
+              <Link
                 key={link}
-                href="#"
+                to={
+                  link === "Skincare" ? "/products" : 
+                  link === "About" ? "/about" : 
+                  link === "Contact" ? "/contact" : "#"
+                }
                 className="font-body text-sm font-medium text-muted-foreground hover:text-foreground transition-colors duration-200"
               >
                 {link}
-              </a>
+              </Link>
             ))}
           </nav>
 
@@ -77,13 +81,18 @@ const Navbar = () => {
         {mobileOpen && (
           <nav className="lg:hidden border-t border-border bg-background px-6 py-4 space-y-3">
             {navLinks.map((link) => (
-              <a
+              <Link
                 key={link}
-                href="#"
+                to={
+                  link === "Skincare" ? "/products" : 
+                  link === "About" ? "/about" : 
+                  link === "Contact" ? "/contact" : "#"
+                }
+                onClick={() => setMobileOpen(false)}
                 className="block font-body text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
               >
                 {link}
-              </a>
+              </Link>
             ))}
           </nav>
         )}

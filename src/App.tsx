@@ -11,6 +11,9 @@ import Login from "./pages/Login.tsx";
 import Signup from "./pages/Signup.tsx";
 import ForgotPassword from "./pages/ForgotPassword.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import Checkout from "./pages/Checkout.tsx";
+import About from "./pages/About.tsx";
+import Contact from "./pages/Contact.tsx";
 
 import { CartProvider } from "./contexts/CartContext.tsx";
 import CartDrawer from "./components/CartDrawer.tsx";
@@ -21,10 +24,10 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <CartProvider>
       <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <CartDrawer />
         <BrowserRouter>
+          <Toaster />
+          <Sonner />
+          <CartDrawer />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/product/:slug" element={<ProductDetail />} />
@@ -33,6 +36,9 @@ const App = () => (
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/checkout" element={<Checkout />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/contact" element={<Contact />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
