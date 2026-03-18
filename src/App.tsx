@@ -9,6 +9,7 @@ import Profile from "./pages/Profile.tsx";
 import AllProducts from "./pages/AllProducts.tsx";
 import Login from "./pages/Login.tsx";
 import Signup from "./pages/Signup.tsx";
+import ForgotPassword from "./pages/ForgotPassword.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 import { CartProvider } from "./contexts/CartContext.tsx";
