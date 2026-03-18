@@ -14,6 +14,7 @@ import NotFound from "./pages/NotFound.tsx";
 import Checkout from "./pages/Checkout.tsx";
 import About from "./pages/About.tsx";
 import Contact from "./pages/Contact.tsx";
+import FAQ from "./pages/FAQ.tsx";
 
 import { CartProvider } from "./contexts/CartContext.tsx";
 import CartDrawer from "./components/CartDrawer.tsx";
@@ -39,6 +40,7 @@ const App = () => (
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/faq" element={<FAQ />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

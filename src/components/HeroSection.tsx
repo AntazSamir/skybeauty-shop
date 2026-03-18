@@ -24,13 +24,13 @@ const HeroSection = () => {
         <div className="mt-8 flex gap-4 animate-fade-in-up-delay-2">
           <a
             href="#products"
-            className="bg-primary text-primary-foreground px-8 py-3 text-sm font-body font-semibold tracking-wide hover:opacity-90 transition-opacity"
+            className="bg-primary text-primary-foreground px-8 py-3 text-sm font-body font-semibold tracking-wide hover:opacity-90 transition-all active:scale-95"
           >
             SHOP NOW
           </a>
           <a
             href="#categories"
-            className="border border-primary-foreground text-primary-foreground px-8 py-3 text-sm font-body font-semibold tracking-wide hover:bg-primary-foreground/10 transition-colors"
+            className="border border-primary-foreground text-primary-foreground px-8 py-3 text-sm font-body font-semibold tracking-wide hover:bg-primary-foreground/10 transition-all active:scale-95"
           >
             EXPLORE
           </a>

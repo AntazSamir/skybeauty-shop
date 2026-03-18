@@ -6,7 +6,10 @@ const Footer = () => {
       <div className="container py-16">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-10">
           <div className="col-span-2 md:col-span-1">
-            <h3 className="font-display text-2xl font-bold mb-4">SkyBD</h3>
+            <div className="flex items-center mb-4 group cursor-pointer transition-all duration-300">
+              <img src="/logo.png" alt="SkyBD Logo" className="h-10 w-auto -mr-1 group-hover:scale-105 transition-transform duration-300" />
+              <h3 className="font-display text-2xl font-bold">SkyBD</h3>
+            </div>
             <p className="font-body text-sm text-secondary-foreground/70 leading-relaxed">
               Your trusted source for premium cosmetics & skincare in Bangladesh.
             </p>
@@ -41,7 +44,13 @@ const Footer = () => {
             <ul className="space-y-2.5">
               {["Track Order", "Shipping Info", "Returns", "FAQ", "Contact Us"].map((link) => (
                 <li key={link}>
-                  <a href="#" className="font-body text-sm text-secondary-foreground/70 hover:text-primary transition-colors">
+                  <a 
+                    href={
+                      link === "FAQ" ? "/faq" : 
+                      link === "Contact Us" ? "/contact" : "#"
+                    } 
+                    className="font-body text-sm text-secondary-foreground/70 hover:text-primary transition-colors"
+                  >
                     {link}
                   </a>
                 </li>

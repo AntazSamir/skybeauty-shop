@@ -38,7 +38,7 @@ const ProductGrid = () => {
             <button
               key={f}
               onClick={() => setActiveFilter(f)}
-              className={`font-body text-sm px-5 py-2 transition-all duration-200 ${
+              className={`font-body text-sm px-5 py-2 transition-all duration-200 active:scale-95 ${
                 activeFilter === f
                   ? "bg-primary text-primary-foreground"
                   : "bg-background text-muted-foreground hover:text-foreground border border-border"
@@ -78,13 +78,13 @@ const ProductGrid = () => {
                   </span>
                 )}
                 <button
-                  className="absolute top-3 right-3 w-8 h-8 bg-background/80 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-background text-muted-foreground hover:text-destructive"
+                  className="absolute top-3 right-3 w-8 h-8 bg-background/80 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-background text-muted-foreground hover:text-destructive active:scale-90"
                   aria-label="Add to wishlist"
                 >
                   <Heart size={16} />
                 </button>
                 <button
-                  className="absolute bottom-3 right-3 w-10 h-10 bg-primary text-primary-foreground flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 hover:opacity-90"
+                  className="absolute bottom-3 right-3 w-10 h-10 bg-primary text-primary-foreground flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 hover:opacity-90 active:scale-90"
                   aria-label="Add to cart"
                 >
                   <ShoppingBag size={16} />
@@ -111,7 +111,7 @@ const ProductGrid = () => {
         <div className="text-center mt-12">
           <Link
             to="/products"
-            className="inline-block border-2 border-foreground text-foreground px-10 py-3 font-body text-sm font-semibold tracking-wide hover:bg-foreground hover:text-background transition-colors duration-200"
+            className="inline-block border-2 border-foreground text-foreground px-10 py-3 font-body text-sm font-semibold tracking-wide hover:bg-foreground hover:text-background transition-all duration-200 active:scale-95"
           >
             VIEW ALL PRODUCTS
           </Link>

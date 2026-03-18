@@ -140,7 +140,7 @@ const CartDrawer = () => {
                 <div className="flex justify-center">
                   <button 
                     onClick={() => setIsCartOpen(false)}
-                    className="font-body text-xs text-muted-foreground hover:text-primary transition-colors underline underline-offset-4"
+                    className="font-body text-xs text-muted-foreground hover:text-primary transition-all underline underline-offset-4 active:scale-95"
                   >
                     Continue Shopping
                   </button>

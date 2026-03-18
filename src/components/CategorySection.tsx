@@ -37,7 +37,7 @@ const CategorySection = () => {
             <a
               key={cat.name}
               href="#"
-              className={`group relative overflow-hidden bg-muted transition-all duration-500 w-[calc(50%-16px)] md:w-[280px] ${
+              className={`group relative overflow-hidden bg-muted transition-all duration-500 w-[calc(50%-16px)] md:w-[280px] active:scale-95 ${
                 visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
               }`}
               style={{ transitionDelay: `${i * 100}ms` }}
