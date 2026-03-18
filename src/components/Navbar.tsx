@@ -52,7 +52,7 @@ const Navbar = () => {
               <Search size={20} />
             </button>
             <Link 
-              to="/profile" 
+              to="/login" 
               className="text-foreground hover:text-primary transition-colors hidden sm:block" 
               aria-label="Account"
             >
