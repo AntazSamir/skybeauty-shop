@@ -7,10 +7,10 @@
  * customer-scoped requests.
  */
 
-const WC_BASE = import.meta.env.VITE_WC_BASE_URL as string;
-const WP_API = import.meta.env.VITE_WP_API_URL as string;
-const CK = import.meta.env.VITE_WC_CONSUMER_KEY as string;
-const CS = import.meta.env.VITE_WC_CONSUMER_SECRET as string;
+const WC_BASE = (import.meta.env.VITE_WC_BASE_URL || import.meta.env.VITE_WC_URL) as string;
+const WP_API = (import.meta.env.VITE_WP_API_URL || `${import.meta.env.VITE_WC_BASE_URL || import.meta.env.VITE_WC_URL}/wp-json`) as string;
+const CK = (import.meta.env.VITE_WC_CONSUMER_KEY || import.meta.env.VITE_WC_KEY) as string;
+const CS = (import.meta.env.VITE_WC_CONSUMER_SECRET || import.meta.env.VITE_WC_SECRET) as string;
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
