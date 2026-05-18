@@ -81,7 +81,7 @@ const AllProducts = () => {
   const queryParams: ProductQueryParams = {
     page,
     per_page: PER_PAGE,
-    search: debouncedSearch || undefined,
+    search: debouncedSearch || (selectedCategoryId === undefined && selectedCategoryLabel !== "All" ? selectedCategoryLabel : undefined),
     category: selectedCategoryId,
     orderby: sortParams.orderby,
     order: sortParams.order,
@@ -137,15 +137,24 @@ const AllProducts = () => {
     setSearchParams({});
   };
 
-  const hasActiveFilters = debouncedSearch || selectedCategoryId;
+  const hasActiveFilters = debouncedSearch || selectedCategoryId || (selectedCategoryLabel !== "All");
 
-  const categoryTabs = [
-    { label: "All", id: undefined },
-    ...(categories?.filter((c) => c.parent === 0 && c.count > 0).map((c) => ({
-      label: c.name,
-      id: c.id,
-    })) ?? []),
-  ];
+  const categoryTabs = (categories && categories.length > 0)
+    ? [
+        { label: "All", id: undefined },
+        ...categories
+          .filter((c) => c.parent === 0)
+          .map((c) => ({
+            label: c.name,
+            id: c.id,
+          }))
+      ]
+    : [
+        { label: "All", id: undefined },
+        { label: "Moisturizer", id: undefined },
+        { label: "Cleanser", id: undefined },
+        { label: "Serum", id: undefined }
+      ];
 
   const skeletons = Array.from({ length: PER_PAGE });
 
