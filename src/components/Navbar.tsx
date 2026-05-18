@@ -124,7 +124,7 @@ const Navbar = () => {
               <Search size={20} />
             </button>
             <Link 
-              to="/login" 
+              to={localStorage.getItem("skybd_user") ? "/profile" : "/login"} 
               className="text-foreground hover:text-primary transition-all duration-200 hover:-translate-y-0.5 hidden sm:block" 
               aria-label="Account"
             >
@@ -164,6 +164,15 @@ const Navbar = () => {
                 {link}
               </Link>
             ))}
+            <div className="pt-2 border-t border-border mt-2">
+              <Link
+                to={localStorage.getItem("skybd_user") ? "/profile" : "/login"}
+                onClick={() => setMobileOpen(false)}
+                className="block font-body text-sm font-semibold text-primary hover:text-primary/80 transition-colors"
+              >
+                {localStorage.getItem("skybd_user") ? "My Profile" : "Sign In / Register"}
+              </Link>
+            </div>
           </nav>
         )}
       </header>

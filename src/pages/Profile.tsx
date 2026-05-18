@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { User, Package, MapPin, Heart, LogOut, ChevronRight, ShoppingBag, Camera } from "lucide-react";
@@ -70,6 +71,7 @@ const mockAddresses = [
 ];
 
 const Profile = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("orders");
   const [userData, setUserData] = useState(initialUser);
   const [editForm, setEditForm] = useState(initialUser);
@@ -77,6 +79,35 @@ const Profile = () => {
   const [editingAddressId, setEditingAddressId] = useState<number | null>(null);
   const [addressForm, setAddressForm] = useState(mockAddresses[0]);
   const { toast } = useToast();
+
+  useEffect(() => {
+    const rawUser = localStorage.getItem("skybd_user");
+    if (!rawUser) {
+      toast({
+        title: "Access Denied",
+        description: "Please sign in to view your profile.",
+        variant: "destructive",
+      });
+      navigate("/login");
+    } else {
+      try {
+        const parsed = JSON.parse(rawUser);
+        const nameVal = parsed.name || parsed.email.split("@")[0].toUpperCase();
+        setUserData(prev => ({
+          ...prev,
+          name: nameVal,
+          email: parsed.email,
+        }));
+        setEditForm(prev => ({
+          ...prev,
+          name: nameVal,
+          email: parsed.email,
+        }));
+      } catch (err) {
+        // ignore
+      }
+    }
+  }, [navigate]);
 
   const handleSave = () => {
     setUserData(editForm);
@@ -163,7 +194,18 @@ const Profile = () => {
                   <ChevronRight size={14} className={activeTab === item.id ? "opacity-100" : "opacity-0"} />
                 </button>
               ))}
-              <Button variant="ghost" className="w-full justify-start gap-3 mt-4 text-destructive hover:text-destructive hover:bg-destructive/10 px-4 py-3 h-auto font-body text-sm">
+              <Button 
+                variant="ghost" 
+                onClick={() => {
+                  localStorage.removeItem("skybd_user");
+                  toast({
+                    title: "Logged Out",
+                    description: "You have been logged out successfully.",
+                  });
+                  navigate("/login");
+                }}
+                className="w-full justify-start gap-3 mt-4 text-destructive hover:text-destructive hover:bg-destructive/10 px-4 py-3 h-auto font-body text-sm"
+              >
                 <LogOut size={18} />
                 Logout
               </Button>
