@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import productSerum from "@/assets/product-serum.jpg";
 import productMoisturizer from "@/assets/product-moisturizer.jpg";
 import productCleanser from "@/assets/product-cleanser.jpg";
-import productLipcare from "@/assets/product-lipcare.jpg";
 
 const categories = [
-  { name: "Skincare", image: productSerum, count: "20+ Products" },
-  { name: "Moisturizers", image: productMoisturizer, count: "12+ Products" },
-  { name: "Cleansers", image: productCleanser, count: "8+ Products" },
+  { name: "Moisturiser", image: productMoisturizer, count: "12+ Products", path: "/products?category=Moisturiser" },
+  { name: "Cleanser", image: productCleanser, count: "8+ Products", path: "/products?category=Cleanser" },
+  { name: "Syrum", image: productSerum, count: "20+ Products", path: "/products?category=Syrum" },
 ];
 
 const CategorySection = () => {
@@ -34,9 +34,9 @@ const CategorySection = () => {
         </p>
         <div className="flex flex-wrap justify-center gap-8">
           {categories.map((cat, i) => (
-            <a
+            <Link
               key={cat.name}
-              href="#"
+              to={cat.path}
               className={`group relative overflow-hidden bg-muted transition-all duration-500 w-[calc(50%-16px)] md:w-[280px] active:scale-95 ${
                 visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
               }`}
@@ -53,7 +53,7 @@ const CategorySection = () => {
                 <h3 className="font-display text-lg font-semibold text-foreground">{cat.name}</h3>
                 <p className="font-body text-xs text-muted-foreground mt-1">{cat.count}</p>
               </div>
-            </a>
+            </Link>
           ))}
         </div>
       </div>

@@ -1,5 +1,6 @@
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
+import NewArrivals from "@/components/NewArrivals";
 import CategorySection from "@/components/CategorySection";
 import ProductGrid from "@/components/ProductGrid";
 import ShopByConcern from "@/components/ShopByConcern"; // New Trendy Section
@@ -13,6 +14,7 @@ const Index = () => {
     <div className="min-h-screen">
       <Navbar />
       <HeroSection />
+      <NewArrivals />
       <CategorySection />
       <ShopByConcern />
       <ProductGrid />

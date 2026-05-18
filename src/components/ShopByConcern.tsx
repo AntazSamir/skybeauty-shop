@@ -61,7 +61,6 @@ const ShopByConcern = () => {
                 />
                 <div className="absolute inset-0 bg-black/5 group-hover:bg-black/20 transition-colors" />
                 
-                {/* Icon Badge */}
                 <div className="absolute top-6 left-6 w-12 h-12 bg-background/90 backdrop-blur-sm rounded-xl flex items-center justify-center text-primary shadow-lg border border-primary/10">
                   <concern.icon size={24} />
                 </div>
@@ -71,12 +70,9 @@ const ShopByConcern = () => {
                 <h3 className="font-display text-lg font-bold text-foreground mb-2 group-hover:text-primary transition-colors">
                   {concern.name}
                 </h3>
-                <p className="font-body text-xs text-muted-foreground leading-relaxed mb-4">
+                <p className="font-body text-xs text-muted-foreground leading-relaxed">
                   {concern.description}
                 </p>
-                <span className="inline-block font-body text-[10px] font-bold tracking-widest text-primary border-b border-primary/20 pb-0.5 uppercase group-hover:border-primary transition-all">
-                  Browse Solutions
-                </span>
               </div>
             </div>
           ))}

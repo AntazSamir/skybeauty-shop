@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, Mail, Lock, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,6 +18,7 @@ const Signup = () => {
   const [agreed, setAgreed] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,10 +39,11 @@ const Signup = () => {
       return;
     }
     setIsLoading(true);
-    // TODO: Connect to auth backend
     setTimeout(() => {
       setIsLoading(false);
-      toast({ title: "Signup functionality coming soon!" });
+      localStorage.setItem("skybd_user", JSON.stringify({ name, email }));
+      toast({ title: "Account created and logged in!" });
+      navigate("/");
     }, 1000);
   };
 

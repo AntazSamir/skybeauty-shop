@@ -42,11 +42,12 @@ const Footer = () => {
           <div>
             <h4 className="font-body text-sm font-semibold mb-4 tracking-wide uppercase">Help</h4>
             <ul className="space-y-2.5">
-              {["Track Order", "Shipping Info", "Returns", "FAQ", "Contact Us"].map((link) => (
+              {["Track Order", "Shipping Info", "Returns", "FAQ", "About Us", "Contact Us"].map((link) => (
                 <li key={link}>
                   <a 
                     href={
                       link === "FAQ" ? "/faq" : 
+                      link === "About Us" ? "/about" : 
                       link === "Contact Us" ? "/contact" : "#"
                     } 
                     className="font-body text-sm text-secondary-foreground/70 hover:text-primary transition-colors"

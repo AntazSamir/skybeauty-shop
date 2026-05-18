@@ -4,14 +4,26 @@ import { ShoppingBag, Heart } from "lucide-react";
 import { products, getProductSlug } from "@/data/products";
 
 
-const filters = ["All", "Skincare", "Makeup", "Cleanser"];
+const filters = ["All", "Moisturiser", "Cleanser", "Syrum"];
 
 const ProductGrid = () => {
   const [activeFilter, setActiveFilter] = useState("All");
   const [visible, setVisible] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
-  const filtered = activeFilter === "All" ? products : products.filter((p) => p.category === activeFilter);
+  const filtered = products.filter((product) => {
+    if (activeFilter === "All") return true;
+    if (activeFilter === "Moisturiser") {
+      return product.name.toLowerCase().includes("moisturizer") || product.name.toLowerCase().includes("cream");
+    }
+    if (activeFilter === "Syrum") {
+      return product.name.toLowerCase().includes("serum");
+    }
+    if (activeFilter === "Cleanser") {
+      return product.category.toLowerCase() === "cleanser" || product.name.toLowerCase().includes("cleanser");
+    }
+    return product.category === activeFilter;
+  });
 
   useEffect(() => {
     const observer = new IntersectionObserver(

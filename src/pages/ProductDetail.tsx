@@ -1,11 +1,12 @@
-import { useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { ShoppingBag, Heart, Star, ChevronLeft, Minus, Plus, Truck, Shield, RotateCcw } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { getProductBySlug, products, getProductSlug } from "@/data/products";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/hooks/use-toast";
 
 import { useCart } from "@/contexts/CartContext";
 
@@ -42,7 +43,117 @@ const ProductDetail = () => {
   const { addToCart } = useCart();
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
-  const [activeTab, setActiveTab] = useState<"description" | "ingredients" | "how-to-use">("description");
+  const [activeTab, setActiveTab] = useState<"description" | "how-to-use">("description");
+
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  // Reviews, rating counts, and Write a Review modal states
+  const [localReviews, setLocalReviews] = useState(reviews);
+  const [productRating, setProductRating] = useState(product ? product.rating : 5);
+  const [productReviewCount, setProductReviewCount] = useState(product ? product.reviews : 0);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [userRating, setUserRating] = useState(5);
+  const [hoverRating, setHoverRating] = useState<number | null>(null);
+  const [reviewTitle, setReviewTitle] = useState("");
+  const [commentText, setCommentText] = useState("");
+  const [showSuccessToast, setShowSuccessToast] = useState(false);
+
+  // Get user details from localStorage
+  const userObj = localStorage.getItem("skybd_user");
+  const loggedInUser = userObj ? JSON.parse(userObj) : null;
+  const defaultAuthorName = loggedInUser ? loggedInUser.name : "Anonymous";
+
+  // Auth Popup / Modal states
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authEmail, setAuthEmail] = useState("");
+  const [authPassword, setAuthPassword] = useState("");
+  const [isAuthLoading, setIsAuthLoading] = useState(false);
+
+  useEffect(() => {
+    if (isAuthModalOpen) {
+      const timer = setTimeout(() => {
+        setIsAuthModalOpen(false);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [isAuthModalOpen]);
+
+  const handleAuthSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!authEmail.trim() || !authPassword.trim()) {
+      toast({ title: "Please fill in all fields", variant: "destructive" });
+      return;
+    }
+    setIsAuthLoading(true);
+    setTimeout(() => {
+      setIsAuthLoading(false);
+      const name = authEmail.split("@")[0].toUpperCase();
+      localStorage.setItem("skybd_user", JSON.stringify({ name, email: authEmail }));
+      toast({ title: `Welcome back, ${name}!`, description: "Successfully logged in." });
+      setIsAuthModalOpen(false);
+      // Clean password
+      setAuthPassword("");
+      // Force page reload to reflect state seamlessly
+      window.location.reload();
+    }, 1000);
+  };
+
+  const handleWriteReviewClick = () => {
+    if (!loggedInUser) {
+      setIsAuthModalOpen(true);
+      return;
+    }
+    setIsModalOpen(true);
+  };
+
+  const handleAddToCartClick = () => {
+    if (!loggedInUser) {
+      setIsAuthModalOpen(true);
+      return;
+    }
+    addToCart(product, quantity);
+  };
+
+  const handleAddReview = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!commentText.trim()) return;
+
+    const today = new Date().toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+
+    const newReview = {
+      id: localReviews.length + 1,
+      author: defaultAuthorName,
+      rating: userRating,
+      date: today,
+      comment: commentText.trim(),
+      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=100&h=100",
+    };
+
+    const newCount = productReviewCount + 1;
+    const newAverage = parseFloat(
+      ((productRating * productReviewCount + userRating) / newCount).toFixed(1)
+    );
+
+    setLocalReviews([newReview, ...localReviews]);
+    setProductRating(newAverage);
+    setProductReviewCount(newCount);
+
+    // Reset Form
+    setUserRating(5);
+    setReviewTitle("");
+    setCommentText("");
+    setIsModalOpen(false);
+
+    // Success notification
+    setShowSuccessToast(true);
+    setTimeout(() => setShowSuccessToast(false), 4000);
+  };
 
   if (!product) {
     return (
@@ -131,12 +242,12 @@ const ProductDetail = () => {
                   <Star
                     key={i}
                     size={14}
-                    className={i < Math.floor(product.rating) ? "fill-primary text-primary" : "text-border"}
+                    className={i < Math.floor(productRating) ? "fill-primary text-primary" : "text-border"}
                   />
                 ))}
               </div>
               <span className="font-body text-sm text-muted-foreground">
-                {product.rating} ({product.reviews} reviews)
+                {productRating} ({productReviewCount} reviews)
               </span>
             </div>
 
@@ -175,7 +286,7 @@ const ProductDetail = () => {
                 </button>
               </div>
               <button 
-                onClick={() => addToCart(product, quantity)}
+                onClick={handleAddToCartClick}
                 className="flex-1 h-12 bg-primary text-primary-foreground font-body text-sm font-semibold tracking-wide flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
               >
                 <ShoppingBag size={18} />
@@ -190,7 +301,7 @@ const ProductDetail = () => {
             <div className="grid grid-cols-3 gap-4 py-6 border-t border-b border-border mb-8">
               <div className="flex flex-col items-center text-center gap-2">
                 <Truck size={20} className="text-primary" />
-                <span className="font-body text-[11px] text-muted-foreground leading-tight">Free Delivery<br />over ৳1500</span>
+                <span className="font-body text-[11px] text-muted-foreground leading-tight">Safe Delivery<br />Guaranteed</span>
               </div>
               <div className="flex flex-col items-center text-center gap-2">
                 <Shield size={20} className="text-primary" />
@@ -204,7 +315,7 @@ const ProductDetail = () => {
 
             {/* Tabs */}
             <div className="flex border-b border-border mb-6">
-              {(["description", "ingredients", "how-to-use"] as const).map((tab) => (
+              {(["description", "how-to-use"] as const).map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
@@ -220,7 +331,6 @@ const ProductDetail = () => {
             </div>
             <div className="font-body text-sm text-muted-foreground leading-relaxed">
               {activeTab === "description" && <p>{product.description}</p>}
-              {activeTab === "ingredients" && <p>{product.ingredients}</p>}
               {activeTab === "how-to-use" && <p>{product.howToUse}</p>}
             </div>
           </div>
@@ -238,13 +348,13 @@ const ProductDetail = () => {
                   <Star
                     key={i}
                     size={18}
-                    className={i < Math.floor(product.rating) ? "fill-primary text-primary" : "text-border"}
+                    className={i < Math.floor(productRating) ? "fill-primary text-primary" : "text-border"}
                   />
                 ))}
               </div>
-              <span className="font-display text-xl font-bold text-foreground">{product.rating}</span>
+              <span className="font-display text-xl font-bold text-foreground">{productRating}</span>
             </div>
-            <p className="font-body text-sm text-muted-foreground uppercase tracking-widest">Based on {product.reviews} verified reviews</p>
+            <p className="font-body text-sm text-muted-foreground uppercase tracking-widest">Based on {productReviewCount} verified reviews</p>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-20">
@@ -274,7 +384,10 @@ const ProductDetail = () => {
                   <p className="font-body text-xs text-muted-foreground leading-relaxed mb-6 italic">
                     95% of customers recommend this product to their friends and family.
                   </p>
-                  <Button className="w-full h-12 font-bold tracking-widest text-xs uppercase shadow-lg shadow-primary/20 hover:scale-[1.02] transition-transform">
+                  <Button 
+                    onClick={handleWriteReviewClick}
+                    className="w-full h-12 font-bold tracking-widest text-xs uppercase shadow-lg shadow-primary/20 hover:scale-[1.02] transition-transform"
+                  >
                     WRITE A REVIEW
                   </Button>
                 </div>
@@ -291,7 +404,7 @@ const ProductDetail = () => {
                 </div>
               </div>
 
-              {reviews.map((review) => (
+              {localReviews.map((review) => (
                 <div key={review.id} className="group bg-background border border-border p-8 rounded-2xl hover:border-primary/30 transition-all hover:shadow-xl hover:shadow-primary/5">
                   <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
                     <div className="flex flex-col gap-4 flex-1">
@@ -305,7 +418,7 @@ const ProductDetail = () => {
                         ))}
                       </div>
                       <h4 className="font-display text-lg font-bold text-foreground leading-snug">
-                        "{review.id === 1 ? "Simply the best I've used" : review.id === 2 ? "Exceeded my expectations" : "Highly recommended"}"
+                        "{review.rating === 5 ? "Simply the best I've used" : review.rating === 4 ? "Exceeded my expectations" : "Great product!"}"
                       </h4>
                       <p className="font-body text-sm text-muted-foreground leading-relaxed italic pr-4">
                         {review.comment}
@@ -375,6 +488,202 @@ const ProductDetail = () => {
             ))}
           </div>
         </section>
+      )}
+
+      {/* Premium Write a Review Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-background border border-border w-full max-w-lg rounded-2xl shadow-2xl p-8 relative animate-in fade-in zoom-in duration-200">
+            <button
+              onClick={() => setIsModalOpen(false)}
+              className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors font-body text-xl"
+              aria-label="Close modal"
+            >
+              &times;
+            </button>
+            <h3 className="font-display text-2xl font-bold text-foreground mb-2">Write a Review</h3>
+            <p className="font-body text-xs text-muted-foreground mb-6 uppercase tracking-wider">
+              Share your experience with {product.name}
+            </p>
+
+            <form onSubmit={handleAddReview} className="space-y-5">
+              {/* Star Rating Selector */}
+              <div>
+                <label className="block font-body text-xs font-bold text-foreground uppercase tracking-wider mb-2">
+                  Rating
+                </label>
+                <div className="flex items-center gap-1.5">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() => setUserRating(star)}
+                      onMouseEnter={() => setHoverRating(star)}
+                      onMouseLeave={() => setHoverRating(null)}
+                      className="transition-transform active:scale-95"
+                    >
+                      <Star
+                        size={28}
+                        className={`transition-colors ${
+                          star <= (hoverRating ?? userRating)
+                            ? "fill-primary text-primary"
+                            : "text-border"
+                        }`}
+                      />
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Author Name */}
+              <div className="bg-muted/40 border border-border/60 p-4 rounded-xl flex items-center justify-between">
+                <div>
+                  <span className="block font-body text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Reviewing As</span>
+                  <span className="font-display text-sm font-bold text-foreground">{defaultAuthorName}</span>
+                </div>
+                <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+              </div>
+
+              {/* Title */}
+              <div>
+                <label className="block font-body text-xs font-bold text-foreground uppercase tracking-wider mb-2">
+                  Review Title
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. Amazing product, highly recommend!"
+                  value={reviewTitle}
+                  onChange={(e) => setReviewTitle(e.target.value)}
+                  className="w-full h-11 px-4 bg-card border border-border rounded-lg text-sm font-body text-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all"
+                />
+              </div>
+
+              {/* Comment */}
+              <div>
+                <label className="block font-body text-xs font-bold text-foreground uppercase tracking-wider mb-2">
+                  Your Review
+                </label>
+                <textarea
+                  required
+                  rows={4}
+                  placeholder="What did you like or dislike? How does it feel on your skin?"
+                  value={commentText}
+                  onChange={(e) => setCommentText(e.target.value)}
+                  className="w-full p-4 bg-card border border-border rounded-lg text-sm font-body text-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all resize-none"
+                />
+              </div>
+
+              <div className="pt-2 flex gap-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsModalOpen(false)}
+                  className="flex-1 h-12 text-xs font-bold tracking-widest uppercase font-body"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  className="flex-1 h-12 text-xs font-bold tracking-widest uppercase font-body shadow-lg shadow-primary/20"
+                >
+                  Submit Review
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Glassmorphic Success Toast */}
+      {showSuccessToast && (
+        <div className="fixed bottom-6 right-6 z-50 bg-background/95 backdrop-blur-md border border-primary/30 p-4 rounded-xl shadow-xl flex items-center gap-3 animate-in fade-in slide-in-from-bottom-4 duration-300">
+          <div className="w-8 h-8 rounded-full bg-green-500/10 border border-green-500/20 flex items-center justify-center">
+            <Star size={16} className="fill-green-500 text-green-500" />
+          </div>
+          <div>
+            <p className="font-display text-xs font-bold text-foreground">Review Submitted!</p>
+            <p className="font-body text-[10px] text-muted-foreground">Thank you for your valuable feedback.</p>
+          </div>
+        </div>
+      )}
+
+      {/* Premium Direct Sign In Modal */}
+      {isAuthModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-background border border-border w-full max-w-md rounded-2xl shadow-2xl p-8 relative animate-in fade-in zoom-in duration-200">
+            <button
+              onClick={() => setIsAuthModalOpen(false)}
+              className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors font-body text-xl"
+              aria-label="Close modal"
+            >
+              &times;
+            </button>
+            <div className="text-center mb-6">
+              <span className="font-display text-2xl font-bold tracking-tight text-foreground">SkyBD</span>
+              <h3 className="font-display text-xl font-bold text-foreground mt-2">Sign In to Your Account</h3>
+              <p className="font-body text-xs text-muted-foreground mt-1">
+                Please sign in to add products to your cart and write reviews.
+              </p>
+            </div>
+
+            <form onSubmit={handleAuthSubmit} className="space-y-4">
+              {/* Email */}
+              <div>
+                <label className="block font-body text-xs font-bold text-foreground uppercase tracking-wider mb-2">
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  required
+                  placeholder="you@example.com"
+                  value={authEmail}
+                  onChange={(e) => setAuthEmail(e.target.value)}
+                  className="w-full h-11 px-4 bg-card border border-border rounded-lg text-sm font-body text-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all"
+                />
+              </div>
+
+              {/* Password */}
+              <div>
+                <label className="block font-body text-xs font-bold text-foreground uppercase tracking-wider mb-2">
+                  Password
+                </label>
+                <input
+                  type="password"
+                  required
+                  placeholder="••••••••"
+                  value={authPassword}
+                  onChange={(e) => setAuthPassword(e.target.value)}
+                  className="w-full h-11 px-4 bg-card border border-border rounded-lg text-sm font-body text-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all"
+                />
+              </div>
+
+              <div className="pt-2 flex gap-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsAuthModalOpen(false)}
+                  className="flex-1 h-12 text-xs font-bold tracking-widest uppercase font-body"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={isAuthLoading}
+                  className="flex-1 h-12 text-xs font-bold tracking-widest uppercase font-body shadow-lg shadow-primary/20"
+                >
+                  {isAuthLoading ? "Signing In..." : "Sign In"}
+                </Button>
+              </div>
+
+              <p className="text-center font-body text-[11px] text-muted-foreground pt-2">
+                Don't have an account?{" "}
+                <Link to="/signup" className="text-primary hover:underline font-semibold">
+                  Sign up
+                </Link>
+              </p>
+            </form>
+          </div>
+        </div>
       )}
 
       <Footer />

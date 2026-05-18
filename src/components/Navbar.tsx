@@ -3,7 +3,7 @@ import { Search, User, ShoppingBag, Menu, X } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { useNavigate, Link } from "react-router-dom";
 
-const navLinks = ["Home", "Skincare", "About", "Contact"];
+const navLinks = ["Home", "Moisturiser", "Cleanser", "Syrum", "Contact"];
 
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -41,7 +41,7 @@ const Navbar = () => {
                 {["Cleansers", "Serums", "Moisturizers", "Sunscreen", "Lip Care"].map(tag => (
                   <button 
                     key={tag}
-                    className="font-body text-xs px-4 py-1.5 bg-muted hover:bg-primary hover:text-primary-foreground text-muted-foreground hover:text-primary-foreground rounded-full transition-all duration-300"
+                    className="font-body text-xs px-4 py-1.5 bg-muted hover:bg-primary hover:text-primary-foreground text-muted-foreground rounded-full transition-all duration-300"
                   >
                     {tag}
                   </button>
@@ -58,7 +58,7 @@ const Navbar = () => {
 
       {/* Announcement bar */}
       <div className="bg-primary text-primary-foreground text-center py-2 text-xs font-body tracking-wide">
-        FREE delivery on orders over ৳1500 · Trusted by 10,000+ customers
+        Safe Delivery guaranteed to your doorstep · Trusted by 10,000+ customers
       </div>
 
       <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
@@ -85,8 +85,9 @@ const Navbar = () => {
                 key={link}
                 to={
                   link === "Home" ? "/" :
-                  link === "Skincare" ? "/products" : 
-                  link === "About" ? "/about" : 
+                  link === "Moisturiser" ? "/products?category=Moisturiser" : 
+                  link === "Cleanser" ? "/products?category=Cleanser" : 
+                  link === "Syrum" ? "/products?category=Syrum" : 
                   link === "Contact" ? "/contact" : "#"
                 }
                 className="font-body text-sm font-medium text-muted-foreground hover:text-foreground transition-all duration-300 relative after:absolute after:bottom-[-4px] after:left-0 after:h-0.5 after:w-0 after:bg-primary after:transition-all hover:after:w-full"
@@ -135,8 +136,9 @@ const Navbar = () => {
                 key={link}
                 to={
                   link === "Home" ? "/" :
-                  link === "Skincare" ? "/products" : 
-                  link === "About" ? "/about" : 
+                  link === "Moisturiser" ? "/products?category=Moisturiser" : 
+                  link === "Cleanser" ? "/products?category=Cleanser" : 
+                  link === "Syrum" ? "/products?category=Syrum" : 
                   link === "Contact" ? "/contact" : "#"
                 }
                 onClick={() => setMobileOpen(false)}

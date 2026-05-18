@@ -19,7 +19,7 @@ const FAQ = () => {
         },
         {
           question: "What are the shipping charges?",
-          answer: "Shipping inside Dhaka is ৳80. Shipping outside Dhaka is ৳150. We offer FREE delivery on orders over ৳1500!"
+          answer: "Shipping inside Dhaka is ৳80. Shipping outside Dhaka is ৳150. We guarantee safe delivery for all orders."
         },
         {
           question: "Can I track my order?",

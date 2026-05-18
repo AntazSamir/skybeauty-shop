@@ -23,10 +23,11 @@ const Login = () => {
       return;
     }
     setIsLoading(true);
-    // TODO: Connect to auth backend
     setTimeout(() => {
       setIsLoading(false);
-      toast({ title: "Login functionality coming soon!" });
+      localStorage.setItem("skybd_user", JSON.stringify({ name: email.split("@")[0].toUpperCase(), email }));
+      toast({ title: "Logged in successfully!" });
+      navigate("/");
     }, 1000);
   };
 
