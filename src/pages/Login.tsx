@@ -61,7 +61,8 @@ const Login = () => {
 
   const handleGoogleSignIn = () => {
     const baseWcUrl = import.meta.env.VITE_WC_URL || import.meta.env.VITE_WC_BASE_URL || "https://cms.skyebd.xyz";
-    const googleLoginUrl = `${baseWcUrl}/wp-login.php?loginSocial=google&redirect=${encodeURIComponent(window.location.origin + "/login")}`;
+    // Using root endpoint /?loginSocial=google is much more robust for headless sites as it bypasses wp-login.php security blocks
+    const googleLoginUrl = `${baseWcUrl}/?loginSocial=google&redirect=${encodeURIComponent(window.location.origin + "/login")}`;
     
     toast({
       title: "Redirecting...",
