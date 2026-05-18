@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useBanners } from "@/hooks/useBanners";
 import heroImage from "@/assets/hero-skincare.jpg";
+import heroCarousel2 from "@/assets/hero-carousel-2.png";
 
 // ─── Static fallback slides ───────────────────────────────────────────────────
 
@@ -18,6 +19,14 @@ const FALLBACK_SLIDES = [
     subtitle: "Premium skincare & cosmetics for everyone. Discover 50+ curated products from world-renowned brands.",
     link: "/products",
     button_text: "SHOP NOW",
+  },
+  {
+    id: 2,
+    image: heroCarousel2,
+    title: "",
+    subtitle: "",
+    link: "/products",
+    button_text: "",
   },
 ];
 
@@ -81,22 +90,30 @@ const HeroSection = () => {
       </div>
 
       {/* Text Content */}
-      <div className="relative z-10 container mx-auto px-6 pt-24 md:pt-32 flex flex-col items-start justify-start h-full text-left">
-        <h1 className="font-display text-4xl md:text-6xl lg:text-7xl font-bold text-white leading-tight animate-fade-in-up-delay-1 drop-shadow-lg max-w-3xl">
-          {slides[currentSlide]?.title}
-        </h1>
-        <p className="font-body text-sm md:text-base text-white/90 mt-4 max-w-xl animate-fade-in-up-delay-2 drop-shadow-md">
-          {slides[currentSlide]?.subtitle}
-        </p>
-        <div className="mt-8 flex flex-col sm:flex-row gap-4 animate-fade-in-up-delay-2 w-full sm:w-auto">
-          <Link
-            to={slides[currentSlide]?.link ?? "/products"}
-            className="bg-primary border-2 border-primary text-primary-foreground px-8 py-3 w-full sm:w-auto text-center text-xs md:text-sm font-body font-bold tracking-widest hover:opacity-95 hover:border-primary/90 transition-all active:scale-95 uppercase rounded-none shadow-lg shadow-primary/20"
-          >
-            {slides[currentSlide]?.button_text ?? "SHOP NOW"}
-          </Link>
+      {(slides[currentSlide]?.title || slides[currentSlide]?.subtitle || slides[currentSlide]?.button_text) && (
+        <div className="relative z-10 container mx-auto px-6 pt-24 md:pt-32 flex flex-col items-start justify-start h-full text-left">
+          {slides[currentSlide]?.title && (
+            <h1 className="font-display text-4xl md:text-6xl lg:text-7xl font-bold text-white leading-tight animate-fade-in-up-delay-1 drop-shadow-lg max-w-3xl">
+              {slides[currentSlide].title}
+            </h1>
+          )}
+          {slides[currentSlide]?.subtitle && (
+            <p className="font-body text-sm md:text-base text-white/90 mt-4 max-w-xl animate-fade-in-up-delay-2 drop-shadow-md">
+              {slides[currentSlide].subtitle}
+            </p>
+          )}
+          {slides[currentSlide]?.button_text && (
+            <div className="mt-8 flex flex-col sm:flex-row gap-4 animate-fade-in-up-delay-2 w-full sm:w-auto">
+              <Link
+                to={slides[currentSlide].link ?? "/products"}
+                className="bg-primary border-2 border-primary text-primary-foreground px-8 py-3 w-full sm:w-auto text-center text-xs md:text-sm font-body font-bold tracking-widest hover:opacity-95 hover:border-primary/90 transition-all active:scale-95 uppercase rounded-none shadow-lg shadow-primary/20"
+              >
+                {slides[currentSlide].button_text}
+              </Link>
+            </div>
+          )}
         </div>
-      </div>
+      )}
 
       {/* Dot Indicators */}
       {slides.length > 1 && (
