@@ -224,7 +224,7 @@ export const authApi = {
    * Plugin: "JWT Authentication for WP-API" must be installed & configured.
    */
   async login(username: string, password: string): Promise<WPAuthResponse> {
-    return apiFetch<WPAuthResponse>(wpUrl("/jwt-auth/v1/token"), {
+    return apiFetch<WPAuthResponse>(wpUrl("/jwt-auth/v1/token/"), {
       method: "POST",
       body: JSON.stringify({ username, password }),
     });
@@ -234,7 +234,7 @@ export const authApi = {
   async validateToken(token: string): Promise<boolean> {
     try {
       await apiFetch<{ code: string; data: { status: number } }>(
-        wpUrl("/jwt-auth/v1/token/validate"),
+        wpUrl("/jwt-auth/v1/token/validate/"),
         { method: "POST", headers: { Authorization: `Bearer ${token}` } }
       );
       return true;
