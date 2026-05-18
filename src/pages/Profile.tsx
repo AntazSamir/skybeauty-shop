@@ -107,7 +107,7 @@ const Profile = () => {
         // ignore
       }
     }
-  }, [navigate]);
+  }, [navigate, toast]);
 
   const handleSave = () => {
     setUserData(editForm);

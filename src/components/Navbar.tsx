@@ -24,7 +24,7 @@ const Navbar = () => {
       setAnnounceIndex((prev) => (prev + 1) % announcements.length);
     }, 4000);
     return () => clearInterval(timer);
-  }, []);
+  }, [announcements.length]);
 
   return (
     <>
