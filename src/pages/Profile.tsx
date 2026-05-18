@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { User, Package, MapPin, Heart, LogOut, ChevronRight, ShoppingBag, Camera } from "lucide-react";
@@ -10,6 +10,30 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
+
+interface OrderItem {
+  name: string;
+  price: number;
+  quantity: number;
+  image: string;
+}
+
+interface Order {
+  id: string;
+  date: string;
+  status: string;
+  total: number;
+  items: OrderItem[];
+}
+
+interface Address {
+  id: number;
+  type: string;
+  name: string;
+  address: string;
+  area: string;
+  phone: string;
+}
 
 const initialUser = {
   name: "Samir Antaz",
@@ -70,14 +94,24 @@ const mockAddresses = [
   },
 ];
 
+const emptyAddress = {
+  id: 0,
+  type: "",
+  name: "",
+  address: "",
+  area: "",
+  phone: "",
+};
+
 const Profile = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("orders");
   const [userData, setUserData] = useState(initialUser);
   const [editForm, setEditForm] = useState(initialUser);
-  const [addresses, setAddresses] = useState(mockAddresses);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [addresses, setAddresses] = useState<Address[]>([]);
   const [editingAddressId, setEditingAddressId] = useState<number | null>(null);
-  const [addressForm, setAddressForm] = useState(mockAddresses[0]);
+  const [addressForm, setAddressForm] = useState(emptyAddress);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -93,16 +127,35 @@ const Profile = () => {
       try {
         const parsed = JSON.parse(rawUser);
         const nameVal = parsed.name || parsed.email.split("@")[0].toUpperCase();
-        setUserData(prev => ({
-          ...prev,
-          name: nameVal,
-          email: parsed.email,
-        }));
-        setEditForm(prev => ({
-          ...prev,
-          name: nameVal,
-          email: parsed.email,
-        }));
+        
+        if (parsed.email === "samir@example.com") {
+          setUserData({
+            ...initialUser,
+            name: "Samir Antaz",
+            email: parsed.email
+          });
+          setEditForm({
+            ...initialUser,
+            name: "Samir Antaz",
+            email: parsed.email
+          });
+          setAddresses(mockAddresses);
+          setOrders(mockOrders);
+        } else {
+          const currentMonthYear = new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(new Date());
+          const cleanUser = {
+            name: nameVal,
+            email: parsed.email,
+            phone: "",
+            since: currentMonthYear,
+            birthday: "",
+            avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=150&h=150",
+          };
+          setUserData(cleanUser);
+          setEditForm(cleanUser);
+          setAddresses([]);
+          setOrders([]);
+        }
       } catch (err) {
         // ignore
       }
@@ -225,58 +278,75 @@ const Profile = () => {
                   </div>
 
                   <div className="space-y-6">
-                    {mockOrders.map((order) => (
-                      <Card key={order.id} className="overflow-hidden border-border bg-card/40 hover:bg-card transition-colors">
-                        <CardHeader className="bg-muted/30 py-4">
-                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                            <div className="flex flex-wrap gap-x-6 gap-y-2">
-                              <div>
-                                <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">Order ID</p>
-                                <p className="text-sm font-semibold text-foreground">{order.id}</p>
+                    {orders.length === 0 ? (
+                      <div className="space-y-8 text-center py-16 border-2 border-dashed border-slate-100 rounded-2xl bg-slate-50/30">
+                        <div className="mx-auto w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-4 text-slate-400">
+                          <ShoppingBag className="w-8 h-8" />
+                        </div>
+                        <h2 className="font-display text-2xl font-bold text-slate-855">No Orders Placed Yet</h2>
+                        <p className="font-body text-sm text-slate-500 max-w-md mx-auto">
+                          Looks like you haven't placed any orders yet. Visit our shop to explore our premium collections of skincare products!
+                        </p>
+                        <Link to="/products">
+                          <Button className="mt-4 px-10 h-11 font-body font-semibold tracking-wider bg-slate-900 hover:bg-slate-800 text-white rounded-lg">
+                            EXPLORE PRODUCTS
+                          </Button>
+                        </Link>
+                      </div>
+                    ) : (
+                      orders.map((order) => (
+                        <Card key={order.id} className="overflow-hidden border-border bg-card/40 hover:bg-card transition-colors">
+                          <CardHeader className="bg-muted/30 py-4">
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                              <div className="flex flex-wrap gap-x-6 gap-y-2">
+                                <div>
+                                  <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">Order ID</p>
+                                  <p className="text-sm font-semibold text-foreground">{order.id}</p>
+                                </div>
+                                <div>
+                                  <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">Placed On</p>
+                                  <p className="text-sm text-foreground">{order.date}</p>
+                                </div>
+                                <div>
+                                  <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">Total Amount</p>
+                                  <p className="text-sm font-bold text-primary">৳{order.total}</p>
+                                </div>
                               </div>
-                              <div>
-                                <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">Placed On</p>
-                                <p className="text-sm text-foreground">{order.date}</p>
-                              </div>
-                              <div>
-                                <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">Total Amount</p>
-                                <p className="text-sm font-bold text-primary">৳{order.total}</p>
-                              </div>
+                              <Badge variant={
+                                order.status === "Delivered" ? "default" : 
+                                order.status === "Processing" ? "secondary" : "outline"
+                              } className="font-body text-[10px] uppercase tracking-wider px-2.5 py-0.5">
+                                {order.status}
+                              </Badge>
                             </div>
-                            <Badge variant={
-                              order.status === "Delivered" ? "default" : 
-                              order.status === "Processing" ? "secondary" : "outline"
-                            } className="font-body text-[10px] uppercase tracking-wider px-2.5 py-0.5">
-                              {order.status}
-                            </Badge>
-                          </div>
-                        </CardHeader>
-                        <CardContent className="p-6">
-                          <div className="space-y-4">
-                            {order.items.map((item, idx) => (
-                              <div key={idx} className="flex items-center gap-4">
-                                <div className="w-16 h-16 bg-muted rounded overflow-hidden border border-border shrink-0">
-                                  <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                          </CardHeader>
+                          <CardContent className="p-6">
+                            <div className="space-y-4">
+                              {order.items.map((item: OrderItem, idx: number) => (
+                                <div key={idx} className="flex items-center gap-4">
+                                  <div className="w-16 h-16 bg-muted rounded overflow-hidden border border-border shrink-0">
+                                    <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <h4 className="text-sm font-semibold text-foreground truncate">{item.name}</h4>
+                                    <p className="text-xs text-muted-foreground">Qty: {item.quantity} · Price: ৳{item.price}</p>
+                                  </div>
                                 </div>
-                                <div className="flex-1 min-w-0">
-                                  <h4 className="text-sm font-semibold text-foreground truncate">{item.name}</h4>
-                                  <p className="text-xs text-muted-foreground">Qty: {item.quantity} · Price: ৳{item.price}</p>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                          <div className="mt-6 pt-6 border-t border-border flex justify-end gap-3">
-                            {order.status !== "Delivered" && (
-                              <Button variant="ghost" className="font-body text-xs h-9 px-4 text-destructive hover:text-destructive hover:bg-destructive/10">
-                                Cancel Order
-                              </Button>
-                            )}
-                            <Button variant="outline" className="font-body text-xs h-9 px-4">Download Invoice</Button>
-                            <Button className="font-body text-xs h-9 px-4">Reorder</Button>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
+                              ))}
+                            </div>
+                            <div className="mt-6 pt-6 border-t border-border flex justify-end gap-3">
+                              {order.status !== "Delivered" && (
+                                <Button variant="ghost" className="font-body text-xs h-9 px-4 text-destructive hover:text-destructive hover:bg-destructive/10">
+                                  Cancel Order
+                                </Button>
+                              )}
+                              <Button variant="outline" className="font-body text-xs h-9 px-4">Download Invoice</Button>
+                              <Button className="font-body text-xs h-9 px-4">Reorder</Button>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))
+                    )}
                   </div>
                 </div>
               )}
@@ -427,6 +497,16 @@ const Profile = () => {
                         </div>
                       </CardContent>
                     </Card>
+                  ) : addresses.length === 0 ? (
+                    <div className="space-y-8 text-center py-16 border-2 border-dashed border-slate-100 rounded-2xl bg-slate-50/30">
+                      <div className="mx-auto w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-4 text-slate-400">
+                        <MapPin className="w-8 h-8" />
+                      </div>
+                      <h2 className="font-display text-2xl font-bold text-slate-855">No Shipping Addresses Saved</h2>
+                      <p className="font-body text-sm text-slate-500 max-w-md mx-auto">
+                        You haven't saved any shipping addresses yet. Click "Add New" in the top right to save your delivery addresses for a faster checkout!
+                      </p>
+                    </div>
                   ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                       {addresses.map((addr) => (
