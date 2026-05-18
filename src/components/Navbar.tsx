@@ -61,10 +61,16 @@ const Navbar = () => {
   };
 
   // Build nav links from WC categories (top 4 parent cats) + static links
-  const categoryNavLinks = categories
-    ?.filter((c) => c.parent === 0 && c.count > 0)
-    .slice(0, 4)
-    .map((c) => ({ label: c.name, to: `/products?category_id=${c.id}&category=${c.name}` })) ?? [];
+  const categoryNavLinks = (categories && categories.length > 0)
+    ? categories
+        .filter((c) => c.parent === 0 && c.count > 0)
+        .slice(0, 4)
+        .map((c) => ({ label: c.name, to: `/products?category_id=${c.id}&category=${c.name}` }))
+    : [
+        { label: "Moisturizer", to: "/products?category=moisturizer" },
+        { label: "Cleanser", to: "/products?category=cleanser" },
+        { label: "Serum", to: "/products?category=serum" }
+      ];
 
   const staticLinks = [
     { label: "Home", to: "/" },
