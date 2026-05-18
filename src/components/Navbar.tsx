@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Search, User, ShoppingBag, Menu, X } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { useNavigate, Link } from "react-router-dom";
@@ -10,6 +10,21 @@ const Navbar = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const { totalItems, setIsCartOpen } = useCart();
   const navigate = useNavigate();
+
+  const announcements = [
+    "Safe Delivery guaranteed to your doorstep · Trusted by 500+ customers",
+    "Enjoy Free Shipping on orders over ৳2,000!",
+    "100% Authentic imported cosmetics & skincare products"
+  ];
+
+  const [announceIndex, setAnnounceIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setAnnounceIndex((prev) => (prev + 1) % announcements.length);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, []);
 
   return (
     <>
@@ -57,8 +72,10 @@ const Navbar = () => {
       )}
 
       {/* Announcement bar */}
-      <div className="bg-primary text-primary-foreground text-center py-2 text-xs font-body tracking-wide">
-        Safe Delivery guaranteed to your doorstep · Trusted by 10,000+ customers
+      <div className="bg-primary text-primary-foreground text-center py-2 text-xs font-body tracking-wide min-h-[32px] flex items-center justify-center transition-all duration-500 ease-in-out">
+        <span className="animate-fade-in">
+          {announcements[announceIndex]}
+        </span>
       </div>
 
       <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">

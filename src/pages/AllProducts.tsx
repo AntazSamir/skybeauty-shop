@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { Search, ShoppingBag, Heart, Filter, ChevronDown, LayoutGrid, List } from "lucide-react";
-import { products, getProductSlug } from "@/data/products";
+import { products, getProductSlug, Product } from "@/data/products";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -66,7 +66,7 @@ const AllProducts = () => {
     }, 1000);
   };
 
-  const handleAddToCartClick = (e: React.MouseEvent, product: any) => {
+  const handleAddToCartClick = (e: React.MouseEvent, product: Product) => {
     e.preventDefault();
     e.stopPropagation(); // Stop navigation to detail page!
     
@@ -110,7 +110,13 @@ const AllProducts = () => {
     if (sortBy === "Price: Low to High") return a.price - b.price;
     if (sortBy === "Price: High to Low") return b.price - a.price;
     if (sortBy === "Newest First") return b.id - a.id;
-    return 0; // Featured
+    
+    // Featured (default): show products with tag === "New" first
+    const aIsNew = a.tag === "New";
+    const bIsNew = b.tag === "New";
+    if (aIsNew && !bIsNew) return -1;
+    if (!aIsNew && bIsNew) return 1;
+    return 0; // retain original order for non-new items
   });
 
   const categories = ["All", "Moisturiser", "Cleanser", "Syrum"];

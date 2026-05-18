@@ -1,11 +1,24 @@
-import { Facebook, Instagram, MessageCircle } from "lucide-react";
+import { useState } from "react";
+import { Facebook, Instagram, MessageCircle, ChevronDown } from "lucide-react";
 
 const Footer = () => {
+  const [openSections, setOpenSections] = useState({
+    shop: false,
+    help: false,
+  });
+
+  const toggleSection = (section: "shop" | "help") => {
+    setOpenSections((prev) => ({
+      ...prev,
+      [section]: !prev[section],
+    }));
+  };
+
   return (
     <footer className="bg-secondary text-secondary-foreground">
-      <div className="container py-16">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-10">
-          <div className="col-span-2 md:col-span-1">
+      <div className="container py-12 md:py-16">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+          <div>
             <div className="flex items-center mb-4 group cursor-pointer transition-all duration-300">
               <img src="/logo.png" alt="SkyBD Logo" className="h-10 w-auto -mr-1 group-hover:scale-105 transition-transform duration-300" />
               <h3 className="font-display text-2xl font-bold">SkyBD</h3>
@@ -26,9 +39,18 @@ const Footer = () => {
             </div>
           </div>
 
-          <div>
-            <h4 className="font-body text-sm font-semibold mb-4 tracking-wide uppercase">Shop</h4>
-            <ul className="space-y-2.5">
+          <div className="border-b border-secondary-foreground/10 sm:border-none pb-4 sm:pb-0">
+            <button 
+              onClick={() => toggleSection("shop")}
+              className="flex justify-between items-center w-full text-left sm:cursor-default sm:pointer-events-none"
+            >
+              <h4 className="font-body text-sm font-semibold tracking-wide uppercase sm:mb-4">Shop</h4>
+              <ChevronDown 
+                size={16} 
+                className={`transition-transform duration-200 sm:hidden ${openSections.shop ? "rotate-180" : ""}`} 
+              />
+            </button>
+            <ul className={`space-y-2.5 mt-4 sm:mt-0 sm:block ${openSections.shop ? "block" : "hidden"}`}>
               {["New Arrivals", "Bestsellers", "Skincare"].map((link) => (
                 <li key={link}>
                   <a href="#" className="font-body text-sm text-secondary-foreground/70 hover:text-primary transition-colors">
@@ -39,9 +61,18 @@ const Footer = () => {
             </ul>
           </div>
 
-          <div>
-            <h4 className="font-body text-sm font-semibold mb-4 tracking-wide uppercase">Help</h4>
-            <ul className="space-y-2.5">
+          <div className="border-b border-secondary-foreground/10 sm:border-none pb-4 sm:pb-0">
+            <button 
+              onClick={() => toggleSection("help")}
+              className="flex justify-between items-center w-full text-left sm:cursor-default sm:pointer-events-none"
+            >
+              <h4 className="font-body text-sm font-semibold tracking-wide uppercase sm:mb-4">Help</h4>
+              <ChevronDown 
+                size={16} 
+                className={`transition-transform duration-200 sm:hidden ${openSections.help ? "rotate-180" : ""}`} 
+              />
+            </button>
+            <ul className={`space-y-2.5 mt-4 sm:mt-0 sm:block ${openSections.help ? "block" : "hidden"}`}>
               {["Track Order", "Shipping Info", "Returns", "FAQ", "About Us", "Contact Us"].map((link) => (
                 <li key={link}>
                   <a 
@@ -64,11 +95,11 @@ const Footer = () => {
             <p className="font-body text-sm text-secondary-foreground/70 mb-4">
               Get exclusive offers & skincare tips.
             </p>
-            <div className="flex">
+            <div className="flex w-full">
               <input
                 type="email"
                 placeholder="Your email"
-                className="flex-1 bg-secondary-foreground/10 px-3 py-2 text-sm font-body text-secondary-foreground placeholder:text-secondary-foreground/40 border-none outline-none focus:ring-1 focus:ring-primary"
+                className="flex-1 w-full bg-secondary-foreground/10 px-3 py-2 text-sm font-body text-secondary-foreground placeholder:text-secondary-foreground/40 border-none outline-none focus:ring-1 focus:ring-primary"
               />
               <button className="bg-primary text-primary-foreground px-4 py-2 text-sm font-body font-semibold hover:opacity-90 transition-opacity">
                 JOIN

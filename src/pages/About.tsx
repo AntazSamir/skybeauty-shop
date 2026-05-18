@@ -1,12 +1,22 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Info } from "lucide-react";
+import aboutHero from "@/assets/about-hero.jpg";
 
 const About = () => {
   return (
     <div className="min-h-screen flex flex-col bg-slate-50/50">
       <Navbar />
-      <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-20">
+      <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-12 md:py-20">
+        {/* Banner Hero Image */}
+        <div className="w-full max-w-6xl mx-auto mb-16 rounded-3xl overflow-hidden shadow-2xl border border-slate-200/40 bg-white bg-opacity-95 backdrop-blur-sm">
+          <img 
+            src={aboutHero} 
+            alt="SKYe.BD About Us Banner" 
+            className="w-full h-auto object-cover hover:scale-[1.01] transition-transform duration-700"
+          />
+        </div>
+
         <div className="flex flex-col items-center text-center max-w-4xl mx-auto">
           <div className="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center mb-8 shadow-sm">
             <Info className="w-12 h-12 text-primary" />
