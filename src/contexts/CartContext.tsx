@@ -1,76 +1,90 @@
+/**
+ * CartContext — WooCommerce-ready cart with localStorage persistence.
+ * CartItem now maps directly from WCProduct for clean type safety.
+ */
+
 import React, { createContext, useContext, useState, useEffect } from "react";
+import type { WCProduct } from "@/lib/woocommerce/types";
+import { getProductImage, formatPrice } from "@/lib/woocommerce/helpers";
+
+// ─── Types ────────────────────────────────────────────────────────────────────
 
 export interface CartItem {
   id: number;
   name: string;
+  slug: string;
   price: number;
   image: string;
   quantity: number;
-  size?: string;
+  stock_status: string;
+  sku: string;
 }
 
 interface CartContextType {
   cartItems: CartItem[];
-  addToCart: (item: any, quantity: number) => void;
+  addToCart: (product: WCProduct, quantity?: number) => void;
   removeFromCart: (id: number) => void;
   updateQuantity: (id: number, quantity: number) => void;
   clearCart: () => void;
   totalItems: number;
   totalPrice: number;
+  formattedTotalPrice: string;
   isCartOpen: boolean;
-  setIsCartOpen: (isOpen: boolean) => void;
+  setIsCartOpen: (open: boolean) => void;
+  isInCart: (id: number) => boolean;
+  getItemQuantity: (id: number) => number;
 }
+
+// ─── Context ──────────────────────────────────────────────────────────────────
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
+const CART_KEY = "skybd_cart";
+
+// ─── Provider ─────────────────────────────────────────────────────────────────
+
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [cartItems, setCartItems] = useState<CartItem[]>(() => {
+    try {
+      const saved = localStorage.getItem(CART_KEY);
+      return saved ? (JSON.parse(saved) as CartItem[]) : [];
+    } catch {
+      return [];
+    }
+  });
   const [isCartOpen, setIsCartOpen] = useState(false);
 
-  // Load cart from localStorage on init
+  // Persist on change
   useEffect(() => {
-    const savedCart = localStorage.getItem("cart");
-    if (savedCart) {
-      try {
-        setCartItems(JSON.parse(savedCart));
-      } catch (e) {
-        console.error("Failed to parse cart from localStorage", e);
-      }
-    }
-  }, []);
-
-  // Save cart to localStorage on change
-  useEffect(() => {
-    localStorage.setItem("cart", JSON.stringify(cartItems));
+    localStorage.setItem(CART_KEY, JSON.stringify(cartItems));
   }, [cartItems]);
 
-  const addToCart = (product: any, quantity: number) => {
+  const addToCart = (product: WCProduct, quantity = 1) => {
     setCartItems((prev) => {
-      const existingItem = prev.find((item) => item.id === product.id);
-      if (existingItem) {
+      const existing = prev.find((item) => item.id === product.id);
+      if (existing) {
         return prev.map((item) =>
           item.id === product.id
             ? { ...item, quantity: item.quantity + quantity }
             : item
         );
       }
-      return [
-        ...prev,
-        {
-          id: product.id,
-          name: product.name,
-          price: product.price,
-          image: product.image,
-          quantity: quantity,
-          size: product.size,
-        },
-      ];
+      const newItem: CartItem = {
+        id: product.id,
+        name: product.name,
+        slug: product.slug,
+        price: parseFloat(product.price) || 0,
+        image: getProductImage(product),
+        quantity,
+        stock_status: product.stock_status,
+        sku: product.sku,
+      };
+      return [...prev, newItem];
     });
   };
 
-  const removeFromCart = (id: number) => {
+  const removeFromCart = (id: number) =>
     setCartItems((prev) => prev.filter((item) => item.id !== id));
-  };
 
   const updateQuantity = (id: number, quantity: number) => {
     if (quantity <= 0) {
@@ -82,12 +96,18 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     );
   };
 
-  const clearCart = () => {
-    setCartItems([]);
-  };
+  const clearCart = () => setCartItems([]);
+
+  const isInCart = (id: number) => cartItems.some((item) => item.id === id);
+
+  const getItemQuantity = (id: number) =>
+    cartItems.find((item) => item.id === id)?.quantity ?? 0;
 
   const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
-  const totalPrice = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const totalPrice = cartItems.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0
+  );
 
   return (
     <CartContext.Provider
@@ -99,8 +119,11 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         clearCart,
         totalItems,
         totalPrice,
+        formattedTotalPrice: formatPrice(totalPrice),
         isCartOpen,
         setIsCartOpen,
+        isInCart,
+        getItemQuantity,
       }}
     >
       {children}
@@ -108,10 +131,10 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   );
 };
 
-export const useCart = () => {
-  const context = useContext(CartContext);
-  if (context === undefined) {
-    throw new Error("useCart must be used within a CartProvider");
-  }
-  return context;
+// ─── Hook ─────────────────────────────────────────────────────────────────────
+
+export const useCart = (): CartContextType => {
+  const ctx = useContext(CartContext);
+  if (!ctx) throw new Error("useCart must be used within <CartProvider>");
+  return ctx;
 };

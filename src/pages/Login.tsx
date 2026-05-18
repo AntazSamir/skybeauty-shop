@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { Eye, EyeOff, Mail, Lock } from "lucide-react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Eye, EyeOff, Mail, Lock, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
@@ -12,23 +13,30 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const { login, isLoading } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Redirect to the page user came from, or home
+  const from = (location.state as { from?: string })?.from ?? "/";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     if (!email || !password) {
-      toast({ title: "Please fill in all fields", variant: "destructive" });
+      setError("Please fill in all fields.");
       return;
     }
-    setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      localStorage.setItem("skybd_user", JSON.stringify({ name: email.split("@")[0].toUpperCase(), email }));
-      toast({ title: "Logged in successfully!" });
-      navigate("/");
-    }, 1000);
+    try {
+      await login(email, password);
+      toast({ title: "Welcome back!", description: "You have been signed in successfully." });
+      navigate(from, { replace: true });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Invalid credentials. Please try again.";
+      setError(msg);
+    }
   };
 
   return (
@@ -41,20 +49,24 @@ const Login = () => {
             <Link to="/" className="font-display text-3xl font-bold text-foreground">
               SkyBD
             </Link>
-            <h1 className="mt-4 font-display text-2xl font-semibold text-foreground">
-              Welcome back
-            </h1>
+            <h1 className="mt-4 font-display text-2xl font-semibold text-foreground">Welcome back</h1>
             <p className="mt-2 font-body text-sm text-muted-foreground">
               Sign in to your account to continue
             </p>
           </div>
 
+          {/* Error */}
+          {error && (
+            <div className="mb-5 flex items-start gap-3 p-4 bg-destructive/10 border border-destructive/20 rounded-lg text-sm text-destructive font-body">
+              <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
+              <span>{error}</span>
+            </div>
+          )}
+
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-2">
-              <Label htmlFor="email" className="font-body text-sm text-foreground">
-                Email address
-              </Label>
+              <Label htmlFor="email" className="font-body text-sm text-foreground">Email address</Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
@@ -64,19 +76,15 @@ const Login = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="pl-10 font-body"
+                  autoComplete="email"
                 />
               </div>
             </div>
 
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="password" className="font-body text-sm text-foreground">
-                  Password
-                </Label>
-                <Link
-                  to="/forgot-password"
-                  className="font-body text-xs text-primary hover:text-primary/80 transition-colors"
-                >
+                <Label htmlFor="password" className="font-body text-sm text-foreground">Password</Label>
+                <Link to="/forgot-password" className="font-body text-xs text-primary hover:text-primary/80 transition-colors">
                   Forgot password?
                 </Link>
               </div>
@@ -89,6 +97,7 @@ const Login = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="pl-10 pr-10 font-body"
+                  autoComplete="current-password"
                 />
                 <button
                   type="button"
@@ -100,19 +109,17 @@ const Login = () => {
               </div>
             </div>
 
-            <Button type="submit" className="w-full font-body" disabled={isLoading}>
-              {isLoading ? "Signing in..." : "Sign in"}
+            <Button type="submit" className="w-full font-body h-11" disabled={isLoading}>
+              {isLoading ? "Signing in…" : "Sign in"}
             </Button>
           </form>
 
-          {/* Divider */}
           <div className="my-6 flex items-center gap-3">
             <div className="h-px flex-1 bg-border" />
             <span className="font-body text-xs text-muted-foreground">or</span>
             <div className="h-px flex-1 bg-border" />
           </div>
 
-          {/* Sign up link */}
           <p className="text-center font-body text-sm text-muted-foreground">
             Don't have an account?{" "}
             <Link to="/signup" className="text-primary font-medium hover:text-primary/80 transition-colors">

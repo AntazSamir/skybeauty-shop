@@ -1,4 +1,5 @@
 import { useCart } from "@/contexts/CartContext";
+import { formatPrice } from "@/lib/woocommerce/helpers";
 import {
   Sheet,
   SheetContent,
@@ -79,13 +80,8 @@ const CartDrawer = () => {
                             <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
-                        {item.size && (
-                          <p className="font-body text-xs text-muted-foreground mt-1">
-                            Size: {item.size}
-                          </p>
-                        )}
                         <p className="font-body text-sm font-bold text-primary mt-2">
-                          ৳{item.price}
+                          {formatPrice(item.price)}
                         </p>
                       </div>
 
@@ -110,7 +106,7 @@ const CartDrawer = () => {
                           </button>
                         </div>
                         <p className="font-body text-sm font-bold text-foreground">
-                          ৳{item.price * item.quantity}
+                          {formatPrice(item.price * item.quantity)}
                         </p>
                       </div>
                     </div>
@@ -123,7 +119,7 @@ const CartDrawer = () => {
               <div className="w-full space-y-4">
                 <div className="flex items-center justify-between">
                   <span className="font-body text-sm text-muted-foreground">Subtotal</span>
-                  <span className="font-display text-lg font-bold text-foreground">৳{totalPrice}</span>
+                  <span className="font-display text-lg font-bold text-foreground">{formatPrice(totalPrice)}</span>
                 </div>
                 <p className="font-body text-xs text-muted-foreground italic">
                   Taxes and shipping calculated at checkout
